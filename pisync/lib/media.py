@@ -23,8 +23,8 @@ class Media(BaseModel, ABC):
     def exists_in_database(self):
         conn = self.__class__.get_db_conn()
         cursor = conn.cursor()
-        select_query = "SELECT file_name FROM media WHERE file_name = ?"
-        cursor.execute(select_query, (self.name,))
+        select_query = "SELECT file_path FROM media WHERE file_path = ?"
+        cursor.execute(select_query, (self.file_path,))
         result = cursor.fetchone()
         conn.close()
         return result is not None
