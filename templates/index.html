@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PiSync</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>PiSync</h1>
+
+    <h2>Clients</h2>
+    <div class="list">
+        <div class="list-item">
+            <span>Client 1</span>
+            <button class="button edit-button">Edit</button>
+        </div>
+        <div class="list-item">
+            <span>Client 2</span>
+            <button class="button edit-button">Edit</button>
+        </div>
+        <button class="button">Add Client</button>
+    </div>
+
+    <h2>Local Media</h2>
+    <div class="list">
+        {% for media in existing_media %}
+        <div class="list-item">
+            <span class="item-name" data-media-id="{{ media.db_id }}">{{media.name}}</span>
+            <button class="button play-button" onclick="playMedia(`{{ media.db_id }}`)">Play</button>
+            <button class="button edit-button" data-media-id="{{ media.db_id }}" data-media-name="{{ media.name }}">Edit</button>
+        </div>
+        {% endfor %}
+        <button class="button">Add Media</button>
+    </div>
+
+    <h2>Cues</h2>
+    <div class="list">
+        <div class="list-item">
+            <span class="item-name">Cue 1</span>
+            <button class="button play-button">Play</button>
+        </div>
+        <div class="list-item">
+            <span class="item-name">Cue 2</span>
+            <button class="button play-button">Play</button>
+        </div>
+        <button class="button">Add Cue</button>
+    </div>
+</div>
+
+<!-- Edit Media Modal -->
+<div id="editMediaModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Edit Media</h2>
+        <form id="editForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name">
+            <button type="submit" class="button">Save</button>
+        </form>
+    </div>
+</div>
+
+<script>
+
+    // Get the modal element
+    const modal = document.getElementById('editMediaModal');
+
+    // Get the button that opens the modal
+    const editButtons = document.getElementsByClassName('edit-button');
+
+    // Get the <span> element that closes the modal
+    const closeBtn = document.getElementsByClassName('close-button')[0];
+
+    // Get the form element
+    const editForm = document.getElementById('editForm');
+
+    let CURRENT_MEDIA_ID = null;
+
+    // Iterate through all edit buttons
+    for (let i = 0; i < editButtons.length; i++) {
+        const editButton = editButtons[i];
+
+        // Add click event listener to each edit button
+        editButton.addEventListener('click', function() {
+            CURRENT_MEDIA_ID = this.getAttribute('data-media-id');
+            const mediaName = this.getAttribute('data-media-name');
+
+            // Populate the modal form with media name
+            const nameInput = document.getElementById('name');
+            nameInput.value = mediaName;
+
+            // Open the modal
+            modal.style.display = 'block';
+        });
+    }
+
+    // Close the modal when the close button is clicked
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+
+    // Close the modal when the user clicks outside of it
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // Handle form submission
+    editForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // Fetch media ID and name from the form
+        const nameInput = document.getElementById('name');
+        const newName = nameInput.value;
+
+        // Create JSON body
+        const requestBody = JSON.stringify({ name: newName, db_id: CURRENT_MEDIA_ID });
+
+        // Send POST request
+        fetch(`/media/update`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: requestBody
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Handle success
+                    console.log('Media updated successfully');
+                    modal.style.display = 'none';
+
+                    response.json().then(data => {
+                        const nameDisplayElem = document.querySelectorAll('[data-media-id="' + CURRENT_MEDIA_ID + '"].item-name')[0];
+                        nameDisplayElem.innerHTML = data.name;
+                    });
+
+                } else {
+                    // Handle error
+                    console.error('Failed to update media');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+    function playMedia(id) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/play/' + id, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Handle successful response here
+                console.log('Media played successfully');
+            } else {
+                // Handle error or other response statuses here
+                console.error('Error playing media');
+            }
+        };
+        xhr.send(JSON.stringify({}));
+    }
+</script>
+
+</body>
+</html>
+

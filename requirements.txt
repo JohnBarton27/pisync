@@ -1,0 +1,5 @@
+fastapi
+jinja2
+pygame
+sqlalchemy
+uvicorn
