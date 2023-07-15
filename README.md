@@ -3,8 +3,14 @@ Easily sync media (audio, video, etc.) across multiple Raspberry Pis (or similar
 special events!
 
 ## Running
-To start, run:
+To start the server, run:
 
 ```
-python main.py
+python server.py
+```
+
+To start any clients, run:
+
+```
+python client.py
 ```
