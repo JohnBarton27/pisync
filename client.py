@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import uvicorn
 
+from pisync.lib.api.info_response import InfoResponse
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -12,6 +13,11 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("client-index.html", {"request": request})
+
+
+@app.get('/info')
+def get_server_info():
+    return InfoResponse(is_client=True)
 
 
 def setup():

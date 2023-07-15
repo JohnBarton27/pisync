@@ -7,6 +7,7 @@ import sqlite3
 import threading
 import uvicorn
 
+from pisync.lib.api.info_response import InfoResponse
 from pisync.lib.api.media_update_request import MediaUpdateRequest
 from pisync.lib.media import Media
 
@@ -19,6 +20,11 @@ templates = Jinja2Templates(directory="templates")
 async def read_root(request: Request):
     stored_media = Media.get_all_from_db()
     return templates.TemplateResponse("index.html", {"request": request,  "existing_media": stored_media})
+
+
+@app.get('/info')
+def get_server_info():
+    return InfoResponse(is_server=True)
 
 
 @app.post("/play/{media_id}")
