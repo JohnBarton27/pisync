@@ -9,7 +9,7 @@
     <h1>PiSync</h1>
 
     <h2>Clients</h2>
-    <div class="list">
+    <div id="clientDisplayList" class="list">
         {% for client in existing_clients %}
         <div class="list-item">
             <span>{{ client.friendly_name }}</span>
@@ -231,8 +231,17 @@
                     console.log('Added clients');
                     clientSearchModal.style.display = 'none';
 
+                    const clientDisplayListElem = document.getElementById("clientDisplayList");
+
                     response.json().then(data => {
-                        console.log(data);
+                        data.forEach(function(newClient) {
+                            const listItem = document.createElement('div');
+                            listItem.className = 'list-item';
+                            listItem.innerHTML = `
+                                <span>${newClient.friendly_name}</span>
+                                <button class="button edit-button">Edit</button>`;
+                            clientDisplayListElem.insertBefore(listItem, clientDisplayListElem.firstChild);
+                        });
                     });
 
                 } else {
