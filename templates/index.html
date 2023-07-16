@@ -50,9 +50,9 @@
 <!-- Edit Media Modal -->
 <div id="editMediaModal" class="modal">
     <div class="modal-content">
-        <span class="close-button">&times;</span>
+        <span id="editMediaModalClose" class="close-button">&times;</span>
         <h2>Edit Media</h2>
-        <form id="editForm">
+        <form id="editMediaForm">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name">
             <button type="submit" class="button">Save</button>
@@ -63,16 +63,16 @@
 <script>
 
     // Get the modal element
-    const modal = document.getElementById('editMediaModal');
+    const editMediaModal = document.getElementById('editMediaModal');
 
     // Get the button that opens the modal
     const editButtons = document.getElementsByClassName('edit-button');
 
     // Get the <span> element that closes the modal
-    const closeBtn = document.getElementsByClassName('close-button')[0];
+    const closeBtn = document.getElementById('editMediaModalClose');
 
     // Get the form element
-    const editForm = document.getElementById('editForm');
+    const editMediaForm = document.getElementById('editMediaForm');
 
     let CURRENT_MEDIA_ID = null;
 
@@ -90,24 +90,24 @@
             nameInput.value = mediaName;
 
             // Open the modal
-            modal.style.display = 'block';
+            editMediaModal.style.display = 'block';
         });
     }
 
     // Close the modal when the close button is clicked
     closeBtn.addEventListener('click', function() {
-        modal.style.display = 'none';
+        editMediaModal.style.display = 'none';
     });
 
     // Close the modal when the user clicks outside of it
     window.addEventListener('click', function(event) {
-        if (event.target === modal) {
-            modal.style.display = 'none';
+        if (event.target === editMediaModal) {
+            editMediaModal.style.display = 'none';
         }
     });
 
     // Handle form submission
-    editForm.addEventListener('submit', function(event) {
+    editMediaForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
         // Fetch media ID and name from the form
@@ -129,7 +129,7 @@
                 if (response.ok) {
                     // Handle success
                     console.log('Media updated successfully');
-                    modal.style.display = 'none';
+                    editMediaModal.style.display = 'none';
 
                     response.json().then(data => {
                         const nameDisplayElem = document.querySelectorAll('[data-media-id="' + CURRENT_MEDIA_ID + '"].item-name')[0];
