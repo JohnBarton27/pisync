@@ -10,14 +10,12 @@
 
     <h2>Clients</h2>
     <div class="list">
+        {% for client in existing_clients %}
         <div class="list-item">
-            <span>Client 1</span>
+            <span>{{ client.friendly_name }}</span>
             <button class="button edit-button">Edit</button>
         </div>
-        <div class="list-item">
-            <span>Client 2</span>
-            <button class="button edit-button">Edit</button>
-        </div>
+        {% endfor %}
         <button class="button" onclick="search_for_clients()">Add Client</button>
     </div>
 

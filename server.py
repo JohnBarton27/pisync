@@ -24,7 +24,10 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     stored_media = Media.get_all_from_db()
-    return templates.TemplateResponse("index.html", {"request": request,  "existing_media": stored_media})
+    stored_clients = ClientObj.get_all_from_db()
+    return templates.TemplateResponse("index.html", {"request": request,
+                                                     "existing_media": stored_media,
+                                                     "existing_clients": stored_clients})
 
 
 @app.get('/info')
