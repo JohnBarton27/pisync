@@ -18,7 +18,7 @@
             <span>Client 2</span>
             <button class="button edit-button">Edit</button>
         </div>
-        <button class="button">Add Client</button>
+        <button class="button" onclick="search_for_clients()">Add Client</button>
     </div>
 
     <h2>Local Media</h2>
@@ -146,7 +146,7 @@
             });
     });
     function playMedia(id) {
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.open('POST', '/play/' + id, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = function() {
@@ -157,9 +157,24 @@
                 // Handle error or other response statuses here
                 console.error('Error playing media');
             }
+        };        xhr.send(JSON.stringify({}));
+    }
+
+    function search_for_clients() {
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', '/clients/search', true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Handle successful response here
+                console.log('Sent request to search for clients!');
+            } else {
+                // Handle error or other response statuses here
+                console.error('Error searching for clients');
+            }
         };
         xhr.send(JSON.stringify({}));
     }
+
 </script>
 
 </body>

@@ -3,10 +3,13 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
+import requests
+import socket
 import sqlite3
 import threading
 import uvicorn
 
+from pisync.lib.api.client_search_response import Client, ClientSearchResponse
 from pisync.lib.api.info_response import InfoResponse
 from pisync.lib.api.media_update_request import MediaUpdateRequest
 from pisync.lib.media import Media
@@ -25,6 +28,52 @@ async def read_root(request: Request):
 @app.get('/info')
 def get_server_info():
     return InfoResponse(is_server=True)
+
+
+@app.post('/clients/search')
+def search_for_clients():
+    print('Searching for clients on the local network....')
+    # Get the local IP address
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))  # TODO this might only work with an internet connection
+    local_ip = s.getsockname()[0]
+    s.close()
+
+    # Create a range of IP addresses in the local network
+    ip_range = local_ip[:local_ip.rfind('.')] + '.0/24'
+
+    found_clients = []
+
+    # Search for IPs with Port 8000 open
+    for i in range(135, 145):
+        ip = ip_range[:ip_range.rfind('.')] + '.' + str(i)
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(0.5)
+            result = sock.connect_ex((ip, 8000))
+            if result == 0:
+                # Check the response body for 'is_client' == True
+                response = requests.get(f"http://{ip}:8000/info")
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get('is_client'):
+                        print(f"Found 'is_client' == True at IP {ip}")
+
+                        try:
+                            hostname = socket.gethostbyaddr(ip)[0]
+                            print(f"Hostname: {hostname}")
+
+                            found_clients.append(Client(hostname=hostname, ip_address=ip))
+
+                        except socket.herror:
+                            print("Failed to retrieve the hostname")
+                else:
+                    print(f"Failed to retrieve info from IP {ip}. Status code: {response.status_code}")
+            sock.close()
+        except socket.error:
+            pass
+
+    return ClientSearchResponse(clients=found_clients)
 
 
 @app.post("/play/{media_id}")
