@@ -201,7 +201,7 @@
                     listItem.className = 'list-item';
                     listItem.innerHTML = `
                         <label>
-                          <input type="checkbox" value="${client.ip}" data-hostname="${client.hostname}" class="client-checkbox">
+                          <input type="checkbox" value="${client.ip_address}" data-hostname="${client.hostname}" class="client-checkbox">
                           ${client.hostname} (${client.ip_address})
                         </label>`;
                     clientListElem.appendChild(listItem);
@@ -263,7 +263,7 @@
                 const hostname = checkbox.getAttribute("data-hostname");
 
                 let client = {
-                    ipAddress: ipAddress,
+                    ip_address: ipAddress,
                     hostname: hostname
                 }
 

@@ -4,6 +4,6 @@ from typing import List
 from pisync.lib.api.common.client import Client
 
 
-class ClientSearchResponse(BaseModel):
+class ClientConnectRequest(BaseModel):
 
     clients: List[Client]

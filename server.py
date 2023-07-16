@@ -9,6 +9,7 @@ import sqlite3
 import threading
 import uvicorn
 
+from pisync.lib.api.client_connect_request import ClientConnectRequest
 from pisync.lib.api.client_search_response import Client, ClientSearchResponse
 from pisync.lib.api.info_response import InfoResponse
 from pisync.lib.api.media_update_request import MediaUpdateRequest
@@ -74,6 +75,11 @@ def search_for_clients():
             pass
 
     return ClientSearchResponse(clients=found_clients)
+
+
+@app.post('/client/add')
+def add_client(request: ClientConnectRequest):
+    print(f'Request to add clients: {request.clients}')
 
 
 @app.post("/play/{media_id}")
