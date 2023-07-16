@@ -10,9 +10,10 @@ import threading
 import uvicorn
 
 from pisync.lib.api.client_connect_request import ClientConnectRequest
-from pisync.lib.api.client_search_response import Client, ClientSearchResponse
+from pisync.lib.api.client_search_response import Client as ApiClient, ClientSearchResponse
 from pisync.lib.api.info_response import InfoResponse
 from pisync.lib.api.media_update_request import MediaUpdateRequest
+from pisync.lib.client import Client as ClientObj
 from pisync.lib.media import Media
 
 
@@ -64,7 +65,7 @@ def search_for_clients():
                             hostname = socket.gethostbyaddr(ip)[0]
                             print(f"Hostname: {hostname}")
 
-                            found_clients.append(Client(hostname=hostname, ip_address=ip))
+                            found_clients.append(ApiClient(hostname=hostname, ip_address=ip))
 
                         except socket.herror:
                             print("Failed to retrieve the hostname")
@@ -80,6 +81,14 @@ def search_for_clients():
 @app.post('/client/add')
 def add_client(request: ClientConnectRequest):
     print(f'Request to add clients: {request.clients}')
+
+    for client in request.clients:
+        client_obj = ClientObj(hostname=client.hostname, friendly_name=client.hostname, ip_address=client.ip_address)
+        client_obj.insert_to_db()
+
+    all_clients = ClientObj.get_all_from_db()
+
+    return all_clients
 
 
 @app.post("/play/{media_id}")
@@ -124,6 +133,17 @@ def setup():
         file_path TEXT UNIQUE,
         file_name TEXT UNIQUE,
         file_type TEXT
+    )
+    """
+    app.db_cursor.execute(create_table_query)
+
+    # Define the Clients table
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS clients (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        hostname TEXT UNIQUE,
+        friendly_name TEXT UNIQUE,
+        ip_address TEXT
     )
     """
     app.db_cursor.execute(create_table_query)
