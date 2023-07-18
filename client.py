@@ -29,12 +29,12 @@ def get_server_info():
 def connect_to_server():
     # Connect to the server
     server_ip = '192.168.1.115'  # TODO remove hardcoded server IP
-    client_socket.connect((server_ip, settings.SOCKET_PORT))
-
-    print('Connected to the server:', server_ip, settings.SOCKET_PORT)
 
     while True:
         try:
+            client_socket.connect((server_ip, settings.SOCKET_PORT))
+            print('Connected to the server:', server_ip, settings.SOCKET_PORT)
+            
             send_message('Hello, server!')
             break
         except:
