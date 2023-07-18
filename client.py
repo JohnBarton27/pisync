@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 import uvicorn
 
 from pisync.lib.api.info_response import InfoResponse
+import settings
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -27,4 +28,4 @@ def setup():
 
 if __name__ == "__main__":
     setup()
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=settings.PORT)

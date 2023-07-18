@@ -16,6 +16,8 @@ from pisync.lib.api.media_update_request import MediaUpdateRequest
 from pisync.lib.client import Client as ClientObj
 from pisync.lib.media import Media
 
+import settings
+
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -58,7 +60,7 @@ def search_for_clients():
             result = sock.connect_ex((ip, 8000))
             if result == 0:
                 # Check the response body for 'is_client' == True
-                response = requests.get(f"http://{ip}:8000/info")
+                response = requests.get(f"http://{ip}:{settings.PORT}/info")
                 if response.status_code == 200:
                     data = response.json()
                     if data.get('is_client'):
@@ -168,4 +170,4 @@ def setup():
 
 if __name__ == "__main__":
     setup()
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=settings.PORT)

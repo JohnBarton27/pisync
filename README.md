@@ -9,6 +9,8 @@ To start the server, run:
 python server.py
 ```
 
+The PiSync server will now be running on port 5467 (this can be changed in `settings.py`).
+
 To start any clients, run:
 
 ```
