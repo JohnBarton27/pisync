@@ -20,9 +20,6 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 stop_flag = threading.Event()
 active_threads = []
 
-# Sockets
-open_sockets = []
-
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -42,7 +39,6 @@ def connect_to_server():
         try:
             client_socket.connect((server_ip, settings.SOCKET_PORT))
             print('Connected to the server:', server_ip, settings.SOCKET_PORT)
-            open_sockets.append(client_socket)
             
             send_message('Hello, server!')
 
@@ -54,6 +50,8 @@ def connect_to_server():
         except:
             print('Unable to hit server...')
             time.sleep(2)
+
+    client_socket.close()
 
 
 def send_message(message):
@@ -68,7 +66,7 @@ def receive_message():
         if not data:
             # Server disconnected
             print("Server disconnected.")
-            open_sockets.remove(client_socket)
+            client_socket.close()
             break
         print("Received message:", data.decode())
 
@@ -79,10 +77,6 @@ def receive_message():
 @app.on_event("shutdown")
 async def shutdown_event():
     stop_flag.is_set()
-
-    # Close all open sockets
-    for open_socket in open_sockets:
-        open_socket.close()
 
 
 def setup():
