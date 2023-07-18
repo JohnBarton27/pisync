@@ -221,6 +221,8 @@ def start_socket_server(server_socket):
         client_thread.start()
         active_threads.append(client_thread)
 
+    server_socket.close()
+
 
 def connect_to_clients():
     clients = ClientObj.get_all_from_db()
