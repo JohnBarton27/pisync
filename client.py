@@ -37,9 +37,14 @@ def connect_to_server():
             print('Connected to the server:', server_ip, settings.SOCKET_PORT)
             
             send_message('Hello, server!')
+
+            # Continually receive data
+            receive_thread = threading.Thread(target=receive_message)
+            receive_thread.start()
+
             break
         except:
-            print('Unable to hit server...')
+            print('Unable to hit server...')1
             time.sleep(2)
 
 
@@ -57,6 +62,9 @@ def receive_message():
             print("Server disconnected.")
             break
         print("Received message:", data.decode())
+
+    # If disconnected, try to reconnect
+    connect_to_server()
 
 
 def setup():
