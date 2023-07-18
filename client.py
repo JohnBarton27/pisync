@@ -44,7 +44,7 @@ def connect_to_server():
 
             break
         except:
-            print('Unable to hit server...')1
+            print('Unable to hit server...')
             time.sleep(2)
 
 
