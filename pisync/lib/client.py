@@ -7,6 +7,7 @@ class Client(BaseModel):
     hostname: str = None
     friendly_name: str = None
     ip_address: str = None
+    is_online: bool = False
     db_id: int = None
 
     def __eq__(self, other):
@@ -31,8 +32,8 @@ class Client(BaseModel):
         conn = self.__class__.get_db_conn()
         cursor = conn.cursor()
 
-        insert_query = "INSERT INTO clients (hostname, friendly_name, ip_address) VALUES (?, ?, ?)"
-        cursor.execute(insert_query, (self.hostname, self.friendly_name, self.ip_address))
+        insert_query = "INSERT INTO clients (hostname, friendly_name, ip_address, is_online) VALUES (?, ?, ?, ?)"
+        cursor.execute(insert_query, (self.hostname, self.friendly_name, self.ip_address, self.is_online))
         conn.commit()
         conn.close()
 
@@ -75,7 +76,11 @@ class Client(BaseModel):
         ip_address = result['ip_address']
         db_id = result['id']
 
-        return Client(friendly_name=friendly_name, ip_address=ip_address, hostname=hostname, db_id=db_id)
+        return Client(friendly_name=friendly_name,
+                      ip_address=ip_address,
+                      hostname=hostname,
+                      db_id=db_id,
+                      is_online=bool(result['is_online']))
 
     @classmethod
     def get_db_conn(cls):

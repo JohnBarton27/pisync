@@ -149,7 +149,8 @@ def setup():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         hostname TEXT UNIQUE,
         friendly_name TEXT UNIQUE,
-        ip_address TEXT
+        ip_address TEXT,
+        is_online INTEGER
     )
     """
     app.db_cursor.execute(create_table_query)
