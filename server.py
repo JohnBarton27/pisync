@@ -58,10 +58,10 @@ def search_for_clients():
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(0.5)
-            result = sock.connect_ex((ip, settings.PORT))
+            result = sock.connect_ex((ip, settings.API_PORT))
             if result == 0:
                 # Check the response body for 'is_client' == True
-                response = requests.get(f"http://{ip}:{settings.PORT}/info")
+                response = requests.get(f"http://{ip}:{settings.API_PORT}/info")
                 if response.status_code == 200:
                     data = response.json()
                     if data.get('is_client'):
@@ -170,6 +170,9 @@ def setup_db():
 def handle_client(client_socket, client_address):
     print('Connected with client:', client_address)
 
+    client_for_socket = ClientObj.get_by_ip_address(client_address)
+    client_for_socket.update_online_status(True)
+
     while True:
         try:
             # Receive data from the client
@@ -177,6 +180,7 @@ def handle_client(client_socket, client_address):
             if not data:
                 # Client disconnected
                 print('Client disconnected:', client_address)
+                client_for_socket.update_online_status(False)
                 break
 
             # Process received data
@@ -186,6 +190,7 @@ def handle_client(client_socket, client_address):
         except ConnectionResetError:
             # Client forcibly closed the connection
             print('Client forcibly closed the connection:', client_address)
+            client_for_socket.update_online_status(False)
             break
 
     # Close the client connection
@@ -210,12 +215,12 @@ def connect_to_clients():
 
     # Bind the socket to a specific IP address and port
     server_ip = '192.168.1.115'  # TODO remove hardcoded server IP
-    server_socket.bind((server_ip, settings.PORT))
+    server_socket.bind((server_ip, settings.SOCKET_PORT))
 
     # Listen for incoming connections
     server_socket.listen()
 
-    print('Server listening on {}:{}'.format(server_ip, settings.PORT))
+    print('Socket server listening on {}:{}'.format(server_ip, settings.SOCKET_PORT))
 
     # Start the socket server in a separate thread
     socket_thread = threading.Thread(target=start_socket_server, args=(server_socket,))
@@ -226,7 +231,7 @@ def connect_to_clients():
     for client in clients:
         print(f'Attempting to connect to {client.hostname}...')
         try:
-            resp = requests.get(f'http://{client.ip_address}:{settings.PORT}')
+            resp = requests.get(f'http://{client.ip_address}:{settings.API_PORT}')
             client.update_online_status(resp.status_code == 200)
         except requests.exceptions.ConnectionError:
             client.update_online_status(False)
@@ -243,4 +248,4 @@ def setup():
 
 if __name__ == "__main__":
     setup()
-    uvicorn.run(app, host="0.0.0.0", port=settings.PORT)
+    uvicorn.run(app, host="0.0.0.0", port=settings.API_PORT)

@@ -29,9 +29,9 @@ def get_server_info():
 def connect_to_server():
     # Connect to the server
     server_ip = '192.168.1.115'  # TODO remove hardcoded server IP
-    client_socket.connect((server_ip, settings.PORT))
+    client_socket.connect((server_ip, settings.SOCKET_PORT))
 
-    print('Connected to the server:', server_ip, settings.PORT)
+    print('Connected to the server:', server_ip, settings.SOCKET_PORT)
 
     while True:
         try:
@@ -67,4 +67,4 @@ def setup():
 
 if __name__ == "__main__":
     setup()
-    uvicorn.run(app, host="0.0.0.0", port=settings.PORT)
+    uvicorn.run(app, host="0.0.0.0", port=settings.API_PORT)

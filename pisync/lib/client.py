@@ -66,6 +66,14 @@ class Client(BaseModel):
         return None
 
     @classmethod
+    def get_by_ip_address(cls, ip_address: str):
+        for client in cls.get_all_from_db():
+            if client.ip_address == ip_address:
+                return client
+
+        return None
+
+    @classmethod
     def get_all_from_db(cls):
         conn = cls.get_db_conn()
         conn.row_factory = sqlite3.Row
