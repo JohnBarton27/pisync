@@ -12,7 +12,12 @@
     <div id="clientDisplayList" class="list">
         {% for client in existing_clients %}
         <div class="list-item">
-            <span>{{ client.friendly_name }}</span>
+            <span{% if not client.is_online %} class="offline-client"{% endif %}>
+                {{ client.friendly_name }}
+            {% if not client.is_online %}
+                (Offline)
+            {% endif %}
+            </span>
             <button class="button edit-button">Edit</button>
         </div>
         {% endfor %}

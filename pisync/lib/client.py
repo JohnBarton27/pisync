@@ -33,7 +33,7 @@ class Client(BaseModel):
         cursor = conn.cursor()
 
         insert_query = "INSERT INTO clients (hostname, friendly_name, ip_address, is_online) VALUES (?, ?, ?, ?)"
-        cursor.execute(insert_query, (self.hostname, self.friendly_name, self.ip_address, self.is_online))
+        cursor.execute(insert_query, (self.hostname, self.friendly_name, self.ip_address, 1 if self.is_online else 0))
         conn.commit()
         conn.close()
 
@@ -44,6 +44,18 @@ class Client(BaseModel):
         cursor.execute(update_query, (new_name, self.db_id))
         conn.commit()
         conn.close()
+
+        self.friendly_name = new_name
+
+    def update_online_status(self, is_online: bool):
+        conn = self.__class__.get_db_conn()
+        cursor = conn.cursor()
+        update_query = "UPDATE clients SET is_online = ? WHERE id = ?"
+        cursor.execute(update_query, (1 if is_online else 0, self.db_id))
+        conn.commit()
+        conn.close()
+
+        self.is_online = is_online
 
     @classmethod
     def get_by_id(cls, db_id: int):

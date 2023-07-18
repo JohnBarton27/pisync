@@ -123,10 +123,7 @@ def play():
     print('Finished playing!')
 
 
-def setup():
-    # Mount static files
-    app.mount("/static", StaticFiles(directory="static"), name="static")
-
+def setup_db():
     # Setup DB
     database_file = "pisync.db"
     app.db_conn = sqlite3.connect(database_file)
@@ -168,6 +165,27 @@ def setup():
     for media in media_files:
         if not media.exists_in_database():
             media.insert_to_db()
+
+
+def connect_to_clients():
+    clients = ClientObj.get_all_from_db()
+
+    for client in clients:
+        print(f'Attempting to connect to {client.hostname}...')
+        try:
+            resp = requests.get(f'http://{client.ip_address}:{settings.PORT}')
+            client.update_online_status(resp.status_code == 200)
+        except requests.exceptions.ConnectionError:
+            client.update_online_status(False)
+
+
+def setup():
+    # Mount static files
+    app.mount("/static", StaticFiles(directory="static"), name="static")
+
+    setup_db()
+
+    connect_to_clients()
 
 
 if __name__ == "__main__":
