@@ -170,7 +170,7 @@ def setup_db():
 def handle_client(client_socket, client_address):
     print('Connected with client:', client_address)
 
-    client_for_socket = ClientObj.get_by_ip_address(client_address)
+    client_for_socket = ClientObj.get_by_ip_address(client_address[0])
     client_for_socket.update_online_status(True)
 
     while True:
@@ -211,6 +211,12 @@ def start_socket_server(server_socket):
 
 
 def connect_to_clients():
+    clients = ClientObj.get_all_from_db()
+
+    # Start all clients as offline until they connect
+    for client in clients:
+        client.update_online_status(False)
+
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # Bind the socket to a specific IP address and port
@@ -225,16 +231,6 @@ def connect_to_clients():
     # Start the socket server in a separate thread
     socket_thread = threading.Thread(target=start_socket_server, args=(server_socket,))
     socket_thread.start()
-
-    clients = ClientObj.get_all_from_db()
-
-    for client in clients:
-        print(f'Attempting to connect to {client.hostname}...')
-        try:
-            resp = requests.get(f'http://{client.ip_address}:{settings.API_PORT}')
-            client.update_online_status(resp.status_code == 200)
-        except requests.exceptions.ConnectionError:
-            client.update_online_status(False)
 
 
 def setup():
