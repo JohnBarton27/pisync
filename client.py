@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import socket
+import threading
 import time
 import uvicorn
 
@@ -62,7 +63,8 @@ def setup():
     # Mount static files
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
-    connect_to_server()
+    socket_thread = threading.Thread(target=connect_to_server)
+    socket_thread.start()
 
 
 if __name__ == "__main__":
