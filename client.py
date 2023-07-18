@@ -33,13 +33,12 @@ def connect_to_server():
 
     print('Connected to the server:', server_ip, settings.PORT)
 
-    while True:
-        try:
-            send_message('Hello, server!')
-            return
-        except Exception as e:
-            print('Unable to hit server...')
-            raise e
+    try:
+        send_message('Hello, server!')
+        return
+    except Exception as e:
+        print('Unable to hit server...')
+        raise e
 
 
 def send_message(message):
