@@ -26,6 +26,9 @@ templates = Jinja2Templates(directory="templates")
 stop_flag = threading.Event()
 active_threads = []
 
+# Sockets
+open_sockets = []
+
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -177,6 +180,8 @@ def handle_client(client_socket, client_address):
     client_for_socket = ClientObj.get_by_ip_address(client_address[0])
     client_for_socket.update_online_status(True)
 
+    open_sockets.append(client_socket)
+
     while True:
         try:
             # Receive data from the client
@@ -185,6 +190,7 @@ def handle_client(client_socket, client_address):
                 # Client disconnected
                 print('Client disconnected:', client_address)
                 client_for_socket.update_online_status(False)
+                open_sockets.remove(client_socket)
                 break
 
             # Process received data
@@ -195,6 +201,7 @@ def handle_client(client_socket, client_address):
             # Client forcibly closed the connection
             print('Client forcibly closed the connection:', client_address)
             client_for_socket.update_online_status(False)
+            open_sockets.remove(client_socket)
             break
 
     # Close the client connection
@@ -243,6 +250,11 @@ def connect_to_clients():
 async def shutdown_event():
     # Set the stop flag to signal threads to stop
     stop_flag.set()
+
+    # Close all open sockets
+    for open_socket in open_sockets:
+        open_socket.close()
+
     # Wait for threads to finish before exiting
     for thread in active_threads:
         thread.join()
