@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import socket
+import time
 import uvicorn
 
 from pisync.lib.api.info_response import InfoResponse
@@ -32,8 +33,13 @@ def connect_to_server():
 
     print('Connected to the server:', server_ip, settings.PORT)
 
-    send_message('Hello, server!')
-
+    while True:
+        try:
+            send_message('Hello, server!')
+            break
+        except Exception as e:
+            print('Unable to hit server...')
+            raise e
 
 def send_message(message):
     while True:
