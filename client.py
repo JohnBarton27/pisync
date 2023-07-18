@@ -16,6 +16,9 @@ templates = Jinja2Templates(directory="templates")
 # Create a socket object
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+# Sockets
+open_sockets = []
+
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -35,6 +38,7 @@ def connect_to_server():
         try:
             client_socket.connect((server_ip, settings.SOCKET_PORT))
             print('Connected to the server:', server_ip, settings.SOCKET_PORT)
+            open_sockets.append(client_socket)
             
             send_message('Hello, server!')
 
@@ -60,11 +64,19 @@ def receive_message():
         if not data:
             # Server disconnected
             print("Server disconnected.")
+            open_sockets.remove(client_socket)
             break
         print("Received message:", data.decode())
 
     # If disconnected, try to reconnect
     connect_to_server()
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    # Close all open sockets
+    for open_socket in open_sockets:
+        open_socket.close()
 
 
 def setup():
