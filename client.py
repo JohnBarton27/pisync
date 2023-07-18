@@ -16,6 +16,10 @@ templates = Jinja2Templates(directory="templates")
 # Create a socket object
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+# Threads
+stop_flag = threading.Event()
+active_threads = []
+
 # Sockets
 open_sockets = []
 
@@ -34,7 +38,7 @@ def connect_to_server():
     # Connect to the server
     server_ip = '192.168.1.115'  # TODO remove hardcoded server IP
 
-    while True:
+    while not stop_flag.is_set():
         try:
             client_socket.connect((server_ip, settings.SOCKET_PORT))
             print('Connected to the server:', server_ip, settings.SOCKET_PORT)
@@ -58,7 +62,7 @@ def send_message(message):
 
 
 def receive_message():
-    while True:
+    while not stop_flag.is_set():
         # Receive data from the server
         data = client_socket.recv(1024)
         if not data:
@@ -74,6 +78,8 @@ def receive_message():
 
 @app.on_event("shutdown")
 async def shutdown_event():
+    stop_flag.is_set()
+
     # Close all open sockets
     for open_socket in open_sockets:
         open_socket.close()

@@ -182,7 +182,7 @@ def handle_client(client_socket, client_address):
 
     open_sockets.append(client_socket)
 
-    while True:
+    while not stop_flag.is_set():
         try:
             # Receive data from the client
             data = client_socket.recv(1024)
@@ -209,7 +209,7 @@ def handle_client(client_socket, client_address):
 
 
 def start_socket_server(server_socket):
-    while True:
+    while not stop_flag.is_set():
         # Accept a client connection
         client_socket, client_address = server_socket.accept()
 
@@ -264,7 +264,7 @@ async def shutdown_event():
     # Wait for threads to finish before exiting
     for thread in active_threads:
         print(f"CLOSING {thread}...")
-        thread.stop()  # TODO make this more graceful
+        thread.join()
 
     print("READY FOR SHUTDOWN.")
 
