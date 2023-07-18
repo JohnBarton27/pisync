@@ -33,18 +33,18 @@ def connect_to_server():
 
     print('Connected to the server:', server_ip, settings.PORT)
 
-    try:
-        send_message('Hello, server!')
-        return
-    except Exception as e:
-        print('Unable to hit server...')
-        raise e
+    while True:
+        try:
+            send_message('Hello, server!')
+            return
+        except Exception as e:
+            print('Unable to hit server...')
+            raise e
 
 
 def send_message(message):
-    while True:
-        # Send data to the server
-        client_socket.send(message.encode())
+    # Send data to the server
+    client_socket.send(message.encode())
 
 
 def receive_message():
