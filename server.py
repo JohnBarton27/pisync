@@ -248,16 +248,25 @@ def connect_to_clients():
 
 @app.on_event("shutdown")
 async def shutdown_event():
+    print("STARTING SHUTDOWN...")
     # Set the stop flag to signal threads to stop
     stop_flag.set()
 
+    print("CLOSING OPEN SOCKETS...")
     # Close all open sockets
     for open_socket in open_sockets:
+        print(f'CLOSING {open_socket}...')
         open_socket.close()
 
+    print("ALL SOCKETS CLOSED.")
+
+    print("CLOSING ACTIVE THREADS...")
     # Wait for threads to finish before exiting
     for thread in active_threads:
-        thread.join()
+        print(f"CLOSING {thread}...")
+        thread.stop()  # TODO make this more graceful
+
+    print("READY FOR SHUTDOWN.")
 
 
 def setup():
