@@ -167,7 +167,44 @@ def setup_db():
             media.insert_to_db()
 
 
+def handle_client(client_socket, client_address):
+    print('Connected with client:', client_address)
+
+    # Process client requests or send/receive data
+
+    # Close the client connection
+    client_socket.close()
+
+
+def start_socket_server(server_socket):
+    while True:
+        # Accept a client connection
+        client_socket, client_address = server_socket.accept()
+
+        # Start a new thread to handle the client connection
+        client_thread = threading.Thread(
+            target=handle_client,
+            args=(client_socket, client_address)
+        )
+        client_thread.start()
+
+
 def connect_to_clients():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # Bind the socket to a specific IP address and port
+    server_ip = '192.168.1.115'  # TODO remove hardcoded server IP
+    server_socket.bind((server_ip, settings.PORT))
+
+    # Listen for incoming connections
+    server_socket.listen()
+
+    print('Server listening on {}:{}'.format(server_ip, settings.PORT))
+
+    # Start the socket server in a separate thread
+    socket_thread = threading.Thread(target=start_socket_server, args=(server_socket,))
+    socket_thread.start()
+
     clients = ClientObj.get_all_from_db()
 
     for client in clients:
