@@ -170,7 +170,23 @@ def setup_db():
 def handle_client(client_socket, client_address):
     print('Connected with client:', client_address)
 
-    # Process client requests or send/receive data
+    while True:
+        try:
+            # Receive data from the client
+            data = client_socket.recv(1024)
+            if not data:
+                # Client disconnected
+                print('Client disconnected:', client_address)
+                break
+
+            # Process received data
+            message = data.decode()
+            print('Received message from {}: {}'.format(client_address, message))
+
+        except ConnectionResetError:
+            # Client forcibly closed the connection
+            print('Client forcibly closed the connection:', client_address)
+            break
 
     # Close the client connection
     client_socket.close()

@@ -36,10 +36,11 @@ def connect_to_server():
     while True:
         try:
             send_message('Hello, server!')
-            break
+            return
         except Exception as e:
             print('Unable to hit server...')
             raise e
+
 
 def send_message(message):
     while True:
