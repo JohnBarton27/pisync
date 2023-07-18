@@ -30,7 +30,7 @@
         <div class="list-item">
             <span class="item-name" data-media-id="{{ media.db_id }}">{{media.name}}</span>
             <button class="button play-button" onclick="playMedia(`{{ media.db_id }}`)">Play</button>
-            <button class="button edit-button" data-media-id="{{ media.db_id }}" data-media-name="{{ media.name }}">Edit</button>
+            <button class="button edit-button edit-media-btn" data-media-id="{{ media.db_id }}" data-media-name="{{ media.name }}">Edit</button>
         </div>
         {% endfor %}
         <button class="button">Add Media</button>
@@ -73,113 +73,26 @@
     </div>
 </div>
 
+<script src="{{ url_for('static', path='/js/index_media.js') }}"></script>
+
 <script>
-
-    // Edit Media Modal Elements
-    const editMediaModal = document.getElementById('editMediaModal');
-    const closeEditMediaModalBtn = document.getElementById('editMediaModalClose');
-    const editMediaForm = document.getElementById('editMediaForm');
-    let CURRENT_MEDIA_ID = null;
-
-    // Get the button that opens the modal
-    const editButtons = document.getElementsByClassName('edit-button');
-
     // Search for Clients Modal
     const clientSearchModal = document.getElementById('clientSearchModal');
     const closeClientSearchModalBtn = document.getElementById('clientSearchModalClose');
     const clientSearchModalHeader = document.getElementById('searchClientsHeader');
     const clientSearchConnectBtn = document.getElementById('connectToClientsBtn');
 
-    // Iterate through all edit buttons
-    for (let i = 0; i < editButtons.length; i++) {
-        const editButton = editButtons[i];
-
-        // Add click event listener to each edit button
-        editButton.addEventListener('click', function() {
-            CURRENT_MEDIA_ID = this.getAttribute('data-media-id');
-            const mediaName = this.getAttribute('data-media-name');
-
-            // Populate the modal form with media name
-            const nameInput = document.getElementById('name');
-            nameInput.value = mediaName;
-
-            // Open the modal
-            editMediaModal.style.display = 'block';
-        });
-    }
-
     // Close the modal when the close button is clicked
-    closeEditMediaModalBtn.addEventListener('click', function() {
-        editMediaModal.style.display = 'none';
-    });
-
     closeClientSearchModalBtn.addEventListener('click', function() {
         clientSearchModal.style.display = 'none';
     })
 
     // Close the modal when the user clicks outside of it
     window.addEventListener('click', function(event) {
-        if (event.target === editMediaModal) {
-            editMediaModal.style.display = 'none';
-        } else if (event.target === clientSearchModal) {
+        if (event.target === clientSearchModal) {
             clientSearchModal.style.display = 'none';
         }
     });
-
-    // Handle form submission
-    editMediaForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        // Fetch media ID and name from the form
-        const nameInput = document.getElementById('name');
-        const newName = nameInput.value;
-
-        // Create JSON body
-        const requestBody = JSON.stringify({ name: newName, db_id: CURRENT_MEDIA_ID });
-
-        // Send POST request
-        fetch(`/media/update`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: requestBody
-        })
-            .then(response => {
-                if (response.ok) {
-                    // Handle success
-                    console.log('Media updated successfully');
-                    editMediaModal.style.display = 'none';
-
-                    response.json().then(data => {
-                        const nameDisplayElem = document.querySelectorAll('[data-media-id="' + CURRENT_MEDIA_ID + '"].item-name')[0];
-                        nameDisplayElem.innerHTML = data.name;
-                    });
-
-                } else {
-                    // Handle error
-                    console.error('Failed to update media');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    });
-    function playMedia(id) {
-        let xhr = new XMLHttpRequest();
-        xhr.open('POST', '/play/' + id, true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                // Handle successful response here
-                console.log('Media played successfully');
-            } else {
-                // Handle error or other response statuses here
-                console.error('Error playing media');
-            }
-        };
-        xhr.send(JSON.stringify({}));
-    }
 
     function search_for_clients() {
         clientSearchModalHeader.textContent = 'Searching for Clients...';

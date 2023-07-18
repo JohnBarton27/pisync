@@ -22,6 +22,10 @@ import settings
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+# Threads
+stop_flag = threading.Event()
+active_threads = []
+
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -208,6 +212,7 @@ def start_socket_server(server_socket):
             args=(client_socket, client_address)
         )
         client_thread.start()
+        active_threads.append(client_thread)
 
 
 def connect_to_clients():
@@ -231,6 +236,16 @@ def connect_to_clients():
     # Start the socket server in a separate thread
     socket_thread = threading.Thread(target=start_socket_server, args=(server_socket,))
     socket_thread.start()
+    active_threads.append(socket_thread)
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    # Set the stop flag to signal threads to stop
+    stop_flag.set()
+    # Wait for threads to finish before exiting
+    for thread in active_threads:
+        thread.join()
 
 
 def setup():
