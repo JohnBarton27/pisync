@@ -9,6 +9,15 @@ class Client(BaseModel):
     ip_address: str = None
     db_id: int = None
 
+    def __eq__(self, other):
+        if not isinstance(other, Client):
+            return False
+
+        return self.hostname == other.hostname
+
+    def __hash__(self):
+        return hash(self.hostname)
+
     def exists_in_database(self):
         conn = self.__class__.get_db_conn()
         cursor = conn.cursor()

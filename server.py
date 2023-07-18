@@ -39,7 +39,8 @@ def get_server_info():
 
 @app.post('/clients/search')
 def search_for_clients():
-    print('Searching for clients on the local network....')
+    existing_clients = ClientObj.get_all_from_db()
+
     # Get the local IP address
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))  # TODO this might only work with an internet connection
@@ -57,20 +58,20 @@ def search_for_clients():
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(0.5)
-            result = sock.connect_ex((ip, 8000))
+            result = sock.connect_ex((ip, settings.PORT))
             if result == 0:
                 # Check the response body for 'is_client' == True
                 response = requests.get(f"http://{ip}:{settings.PORT}/info")
                 if response.status_code == 200:
                     data = response.json()
                     if data.get('is_client'):
-                        print(f"Found 'is_client' == True at IP {ip}")
-
                         try:
                             hostname = socket.gethostbyaddr(ip)[0]
-                            print(f"Hostname: {hostname}")
+                            found_client = ApiClient(hostname=hostname, ip_address=ip)
 
-                            found_clients.append(ApiClient(hostname=hostname, ip_address=ip))
+                            # Only look for "new" clients here
+                            if not any([existing_client.hostname == found_client.hostname for existing_client in existing_clients]):
+                                found_clients.append(found_client)
 
                         except socket.herror:
                             print("Failed to retrieve the hostname")
