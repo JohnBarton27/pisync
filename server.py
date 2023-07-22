@@ -26,6 +26,7 @@ templates = Jinja2Templates(directory="templates")
 stop_flag = threading.Event()
 active_threads = []
 
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     stored_media = Media.get_all_from_db()
@@ -176,6 +177,8 @@ def handle_client(client_socket, client_address):
     client_for_socket = ClientObj.get_by_ip_address(client_address[0])
     client_for_socket.update_online_status(True)
 
+    client_socket.settimeout(1)
+
     while not stop_flag.is_set():
         try:
             # Receive data from the client
@@ -197,6 +200,8 @@ def handle_client(client_socket, client_address):
             client_for_socket.update_online_status(False)
             client_socket.close()
             break
+        except socket.timeout:
+            continue
 
     # Close the client connection
     client_socket.close()
@@ -204,16 +209,19 @@ def handle_client(client_socket, client_address):
 
 def start_socket_server(server_socket):
     while not stop_flag.is_set():
-        # Accept a client connection
-        client_socket, client_address = server_socket.accept()
+        try:
+            # Accept a client connection
+            client_socket, client_address = server_socket.accept()
 
-        # Start a new thread to handle the client connection
-        client_thread = threading.Thread(
-            target=handle_client,
-            args=(client_socket, client_address)
-        )
-        client_thread.start()
-        active_threads.append(client_thread)
+            # Start a new thread to handle the client connection
+            client_thread = threading.Thread(
+                target=handle_client,
+                args=(client_socket, client_address)
+            )
+            client_thread.start()
+            active_threads.append(client_thread)
+        except socket.timeout:
+            continue
 
     server_socket.close()
 
@@ -229,6 +237,7 @@ def connect_to_clients():
 
     # Bind the socket to a specific IP address and port
     server_ip = '192.168.1.115'  # TODO remove hardcoded server IP
+    server_socket.settimeout(1)
     server_socket.bind((server_ip, settings.SOCKET_PORT))
 
     # Listen for incoming connections
@@ -266,6 +275,7 @@ def setup():
     connect_to_clients()
 
 
+setup()
+
 if __name__ == "__main__":
-    setup()
-    uvicorn.run(app, host="0.0.0.0", port=settings.API_PORT)
+    uvicorn.run(app, host="0.0.0.0", port=settings.API_PORT, reload=False)
