@@ -11,15 +11,15 @@ socket.onclose = function (event) {
 socket.onmessage = function (event) {
     const message = JSON.parse(event.data);
     console.log("New message: " + message.text);
-    const elementWithDesiredIp = document.querySelector(`[data-client-ip="${message.ipAddress}"]`);
+    const elementsWithDesiredIp = document.querySelectorAll(`[data-client-ip="${message.ipAddress}"]`);
 
-    if (message.connected) {
-        elementWithDesiredIp.classList.remove("offline-client");
-        elementWithDesiredIp.textContent = message.name;
-    } else {
-        elementWithDesiredIp.classList.add("offline-client");
-        elementWithDesiredIp.textContent = message.name + " (Offline)";
-    }
+    elementsWithDesiredIp.forEach((elementWithDesiredIp) => {
+        if (message.connected) {
+            elementWithDesiredIp.classList.remove("offline-client");
+        } else {
+            elementWithDesiredIp.classList.add("offline-client");
+        }
+    });
 
 
 
