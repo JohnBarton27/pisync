@@ -21,7 +21,10 @@ class Video(Media):
         # start playing video
         media_player.play()
 
+        while not media_player.is_playing():
+            continue
+
         while media_player.is_playing():
-            pass
+            continue
 
         media_player.stop()
