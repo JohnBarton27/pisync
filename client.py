@@ -14,6 +14,8 @@ from pisync.lib.media import Media
 import settings
 
 app = FastAPI()
+app.state.db_name = 'pisync_client.db'
+settings.APP_TYPE = 'client'
 templates = Jinja2Templates(directory="templates")
 
 # Create a socket object
@@ -88,7 +90,7 @@ async def shutdown_event():
 
 def setup_db():
     # Setup DB
-    database_file = "pisync_client.db"
+    database_file = app.state.db_name
     app.db_conn = sqlite3.connect(database_file)
     app.db_cursor = app.db_conn.cursor()
 
@@ -120,7 +122,7 @@ def setup_db():
 
 def setup():
     setup_db()
-    
+
     # Mount static files
     app.mount("/static", StaticFiles(directory="static"), name="static")
 

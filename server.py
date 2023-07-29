@@ -22,6 +22,8 @@ import settings
 
 
 app = FastAPI()
+app.state.db_name = 'pisync.db'
+settings.APP_TYPE = 'server'
 templates = Jinja2Templates(directory="templates")
 
 # Threads
@@ -147,7 +149,7 @@ def play():
 
 def setup_db():
     # Setup DB
-    database_file = "pisync.db"
+    database_file = app.state.db_name
     app.db_conn = sqlite3.connect(database_file)
     app.db_cursor = app.db_conn.cursor()
 

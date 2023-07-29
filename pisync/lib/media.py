@@ -4,6 +4,8 @@ import os
 from pydantic import BaseModel
 import sqlite3
 
+import settings
+
 
 class MediaTypes(Enum):
 
@@ -86,7 +88,10 @@ class Media(BaseModel, ABC):
 
     @classmethod
     def get_db_conn(cls):
-        database_file = "pisync.db"
+        if settings.APP_TYPE == 'client':
+            database_file = "pisync_client.db"
+        else:
+            database_file = "pisync.db"
         return sqlite3.connect(database_file)
 
     @classmethod
