@@ -4,3 +4,4 @@ pygame
 requests
 sqlalchemy
 uvicorn
+uvicorn[standard]

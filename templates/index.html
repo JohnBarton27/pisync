@@ -12,7 +12,7 @@
     <div id="clientDisplayList" class="list">
         {% for client in existing_clients %}
         <div class="list-item">
-            <span{% if not client.is_online %} class="offline-client"{% endif %}>
+            <span{% if not client.is_online %} class="offline-client"{% endif %} data-client-ip="{{ client.ip_address }}">
                 {{ client.friendly_name }}
             {% if not client.is_online %}
                 (Offline)
@@ -75,6 +75,7 @@
 
 <script src="{{ url_for('static', path='/js/index_media.js') }}"></script>
 <script src="{{ url_for('static', path='/js/index_clients.js') }}"></script>
+<script src="{{ url_for('static', path='/js/sockets.js') }}"></script>
 
 </body>
 </html>

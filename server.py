@@ -1,7 +1,9 @@
-from fastapi import FastAPI, Request
+import asyncio
+from fastapi import FastAPI, Request, WebSocket
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+import json
 import os
 import requests
 import socket
@@ -25,6 +27,22 @@ templates = Jinja2Templates(directory="templates")
 # Threads
 stop_flag = threading.Event()
 active_threads = []
+
+connected_clients = set()
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    connected_clients.add(websocket)
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            # Handle incoming messages from the client if needed
+            pass
+    except:
+        connected_clients.remove(websocket)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -171,11 +189,18 @@ def setup_db():
             media.insert_to_db()
 
 
+async def tell_frontend_client_connection_event(client: ClientObj):
+    for fe_client in connected_clients:
+        await fe_client.send_text(json.dumps({'text': 'CLIENT CONNECTION EVENT', 'connected': client.is_online, 'ipAddress': client.ip_address, 'name': client.friendly_name}))
+
+
 def handle_client(client_socket, client_address):
     print('Connected with client:', client_address)
 
     client_for_socket = ClientObj.get_by_ip_address(client_address[0])
     client_for_socket.update_online_status(True)
+
+    asyncio.run(tell_frontend_client_connection_event(client_for_socket))
 
     client_socket.settimeout(1)
 
@@ -187,6 +212,9 @@ def handle_client(client_socket, client_address):
                 # Client disconnected
                 print('Client disconnected:', client_address)
                 client_for_socket.update_online_status(False)
+
+                asyncio.run(tell_frontend_client_connection_event(client_for_socket))
+
                 client_socket.close()
                 break
 
