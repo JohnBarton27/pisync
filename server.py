@@ -159,7 +159,8 @@ def setup_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         file_path TEXT UNIQUE,
         file_name TEXT UNIQUE,
-        file_type TEXT
+        file_type TEXT,
+        client_id INTEGER
     )
     """
     app.db_cursor.execute(create_table_query)

@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
+import pickle
 import socket
 import sqlite3
 import threading
@@ -44,12 +45,11 @@ def connect_to_server():
         try:
             client_socket.connect((server_ip, settings.SOCKET_PORT))
             print('Connected to the server:', server_ip, settings.SOCKET_PORT)
-            
-            send_message('Hello, server!')
 
-            media = Media.get_all_from_db()
+            media_objs = Media.get_all_from_db()
+            media_pickle = pickle.dumps(media_objs)
 
-            send_message(media[0].name)
+            send_message(media_pickle, encode=False)
 
             # Continually receive data
             receive_thread = threading.Thread(target=receive_message)
@@ -63,9 +63,12 @@ def connect_to_server():
     client_socket.close()
 
 
-def send_message(message):
+def send_message(message, encode: bool = True):
     # Send data to the server
-    client_socket.send(message.encode())
+    if encode:
+        client_socket.send(message.encode())
+    else:
+        client_socket.send(message)
 
 
 def receive_message():
