@@ -12,6 +12,7 @@ import uvicorn
 
 from pisync.lib.api.info_response import InfoResponse
 from pisync.lib.media import Media
+from pisync.lib.message import ClientMediaDumpMessage
 import settings
 
 app = FastAPI()
@@ -49,7 +50,8 @@ def connect_to_server():
             media_objs = Media.get_all_from_db()
             media_pickle = pickle.dumps(media_objs)
 
-            send_message(media_pickle, encode=False)
+            opening_message = ClientMediaDumpMessage(client_socket, media_pickle)
+            opening_message.send()
 
             # Continually receive data
             receive_thread = threading.Thread(target=receive_message)

@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import json
 import os
+import pickle
 import requests
 import socket
 import sqlite3
@@ -222,7 +223,7 @@ def handle_client(client_socket, client_address):
                 break
 
             # Process received data
-            media_on_client = data
+            media_on_client = pickle.loads(data)
             print(media_on_client)
             print(f'Received message from {client_address}')
 
