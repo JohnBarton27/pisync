@@ -201,7 +201,7 @@ async def tell_frontend_client_connection_event(client: ClientObj):
         await fe_client.send_text(json.dumps({'text': 'CLIENT CONNECTION EVENT', 'connected': client.is_online, 'ipAddress': client.ip_address, 'name': client.friendly_name}))
 
 
-def handle_client(client_socket, client_address):
+def receive_from_client(client_socket, client_address):
     print('Connected with client:', client_address)
 
     client_for_socket = ClientObj.get_by_ip_address(client_address[0])
@@ -210,6 +210,7 @@ def handle_client(client_socket, client_address):
     asyncio.run(tell_frontend_client_connection_event(client_for_socket))
 
     client_socket.settimeout(1)
+    client_socket.send('HELLO FROM THE SERVER'.encode())
 
     while not stop_flag.is_set():
         try:
@@ -246,6 +247,7 @@ def handle_client(client_socket, client_address):
 
     # Close the client connection
     client_socket.close()
+    client_sockets.remove(client_socket)
 
 
 def start_socket_server(server_socket):
@@ -257,7 +259,7 @@ def start_socket_server(server_socket):
 
             # Start a new thread to handle the client connection
             client_thread = threading.Thread(
-                target=handle_client,
+                target=receive_from_client,
                 args=(client_socket, client_address)
             )
             client_thread.start()
