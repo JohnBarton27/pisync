@@ -181,6 +181,18 @@ def setup_db():
     """
     app.db_cursor.execute(create_table_query)
 
+    # Define the Cues table
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS cues (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        friendly_name TEXT UNIQUE,
+        source_media_id INT NOT NULL,
+        source_media_timecode_secs INT NOT NULL,
+        target_media_id INT
+    )
+    """
+    app.db_cursor.execute(create_table_query)
+
     # Create the 'media' folder if it doesn't exist
     media_dir = os.path.join(os.getcwd(), 'media')
     if not os.path.exists(media_dir):
