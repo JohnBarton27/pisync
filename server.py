@@ -142,7 +142,7 @@ def play_media(media_id: int):
         return
 
     print(f"Playing local media ({media.name})...")
-    media.play(start_time=0, end_time=13)
+    media.play(start_time=630, end_time=655)
     return
 
 
@@ -201,7 +201,7 @@ def setup_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         friendly_name TEXT UNIQUE,
         source_media_id INT NOT NULL,
-        source_media_timecode_secs INT NOT NULL,
+        source_media_timecode_secs REAL NOT NULL,
         target_media_id INT
     )
     """

@@ -5,5 +5,5 @@ class CreateCueRequest(BaseModel):
 
     name: str
     sourceMediaId: int
-    sourceMediaTimecode: int
+    sourceMediaTimecode: float
     targetMediaId: int

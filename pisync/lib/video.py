@@ -21,6 +21,7 @@ class Video(Media):
         # start playing video
         media_player.play()
 
-        time.sleep(5)
+        while media_player.is_playing():
+            pass
 
         media_player.stop()

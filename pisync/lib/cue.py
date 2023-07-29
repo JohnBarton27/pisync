@@ -11,7 +11,7 @@ class Cue(BaseModel):
     name: str = None
     db_id: int = None
     source_media_id: int = None
-    source_media_timecode_secs: int = None
+    source_media_timecode_secs: float = None
     target_media_id: int = None
 
     @property
