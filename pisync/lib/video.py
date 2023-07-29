@@ -21,10 +21,8 @@ class Video(Media):
         # start playing video
         media_player.play()
 
-        while not media_player.is_playing():
-            continue
-
-        while media_player.is_playing():
-            continue
+        time.sleep(1)  # Make sure video has started
+        vid_length_millis = media_player.get_length()
+        time.sleep((vid_length_millis / 1000) - 1)
 
         media_player.stop()
