@@ -12,7 +12,7 @@ import uvicorn
 
 from pisync.lib.api.info_response import InfoResponse
 from pisync.lib.media import Media
-from pisync.lib.message import ClientMediaDumpMessage
+from pisync.lib.message import Message, ClientMediaDumpMessage, MediaPlayRequestMessage
 import settings
 
 app = FastAPI()
@@ -21,7 +21,6 @@ settings.APP_TYPE = 'client'
 templates = Jinja2Templates(directory="templates")
 
 # Create a socket object
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Threads
 stop_flag = threading.Event()
@@ -42,53 +41,37 @@ def connect_to_server():
     # Connect to the server
     server_ip = '192.168.1.115'  # TODO remove hardcoded server IP
 
-    while not stop_flag.is_set():
-        try:
-            client_socket.connect((server_ip, settings.SOCKET_PORT))
-            print('Connected to the server:', server_ip, settings.SOCKET_PORT)
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((server_ip, settings.SOCKET_PORT))
+    print('Connected to the server:', server_ip, settings.SOCKET_PORT)
 
-            media_objs = Media.get_all_from_db()
-            media_pickle = pickle.dumps(media_objs)
+    # Send Media objects to server
+    media_objs = Media.get_all_from_db()
+    media_pickle = pickle.dumps(media_objs)
+    opening_message = ClientMediaDumpMessage(media_pickle)
+    opening_message.send(client_socket)
 
-            opening_message = ClientMediaDumpMessage(media_pickle)
-            opening_message.send(client_socket)
+    welcome_message = client_socket.recv(1024).decode()
+    print(f"Server says: {welcome_message}")
 
-            # Continually receive data
-            receive_thread = threading.Thread(target=receive_message)
-            receive_thread.start()
+    def receive_server_messages():
+        while not stop_flag.is_set():
+            data = client_socket.recv(1024)
+            if not data:
+                # Server disconnected
+                print("Server disconnected.")
+                client_socket.close()
+                break
 
-            break
-        except ConnectionRefusedError:
-            print('Unable to hit server...')
-            time.sleep(2)
-        except OSError:
-            print("Lost established connection to server!")
-            return
-
-    client_socket.close()
-
-
-def send_message(message, encode: bool = True):
-    # Send data to the server
-    if encode:
-        client_socket.send(message.encode())
-    else:
-        client_socket.send(message)
-
-
-def receive_message():
-    while not stop_flag.is_set():
-        # Receive data from the server
-        data = client_socket.recv(1024)
-        if not data:
-            # Server disconnected
-            print("Server disconnected.")
-            client_socket.close()
-            break
-        print("Received message:", data.decode())
+            message_obj = Message.get_from_socket(data)
+            print(message_obj)
 
     # If disconnected, try to reconnect
     connect_to_server()
+
+    recv_thread = threading.Thread(target=receive_server_messages)
+    recv_thread.start()
+    active_threads.append(recv_thread)
 
 
 @app.on_event("shutdown")
