@@ -18,7 +18,7 @@ from pisync.lib.api.info_response import InfoResponse
 from pisync.lib.api.media_update_request import MediaUpdateRequest
 from pisync.lib.client import Client as ClientObj
 from pisync.lib.media import Media
-from pisync.lib.message import Message, ClientMediaDumpMessage
+from pisync.lib.message import Message, ClientMediaDumpMessage, MediaPlayRequestMessage
 
 import settings
 
@@ -33,6 +33,7 @@ stop_flag = threading.Event()
 active_threads = []
 
 connected_clients = set()
+client_sockets = []
 
 
 @app.websocket("/ws")
@@ -126,7 +127,17 @@ def add_client(request: ClientConnectRequest):
 @app.post("/play/{media_id}")
 def play_media(media_id: int):
     media = Media.get_by_id(media_id)
-    print(f"Playing {media.name}...")
+
+    if media.client_id:
+        client_obj = ClientObj.get_by_id(media.client_id)
+        print(f'Looking for client {client_obj.hostname}...')
+        for cli_socket in client_sockets:
+            if cli_socket.getpeername()[0] == client_obj.ip_address:
+                message = MediaPlayRequestMessage(media.file_path)
+                message.send(cli_socket)
+        return
+
+    print(f"Playing local media ({media.name})...")
     media.play(start_time=10, end_time=13)
     return
 
@@ -242,6 +253,7 @@ def start_socket_server(server_socket):
         try:
             # Accept a client connection
             client_socket, client_address = server_socket.accept()
+            client_sockets.append(client_socket)
 
             # Start a new thread to handle the client connection
             client_thread = threading.Thread(

@@ -32,3 +32,17 @@ class ClientMediaDumpMessage(Message):
 
     def get_content(self):
         return pickle.loads(self.content)
+
+
+class MediaPlayRequestMessage(Message):
+
+    def __init__(self, content):
+        """
+        Message the server sends to a client to request the client play a media file
+
+        :param content: Filepath to the Media File to be played
+        """
+        super().__init__(content, "MediaPlayRequestMessage")
+
+    def get_content(self):
+        return self.content
