@@ -58,7 +58,7 @@ def connect_to_server():
             receive_thread.start()
 
             break
-        except:
+        except ConnectionRefusedError as e:
             print('Unable to hit server...')
             time.sleep(2)
 

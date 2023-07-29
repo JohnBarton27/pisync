@@ -3,6 +3,7 @@ from enum import Enum
 import os
 from pydantic import BaseModel
 import sqlite3
+from typing import Optional
 
 import settings
 
@@ -17,7 +18,7 @@ class Media(BaseModel, ABC):
     file_path: str = None
     name: str = None
     db_id: int = None
-    client_id: int = None
+    client_id: Optional[int] = None
 
     @abstractmethod
     def play(self, start_time: int = 0, end_time: int = None):
