@@ -119,6 +119,8 @@ def setup_db():
 
 
 def setup():
+    setup_db()
+    
     # Mount static files
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
