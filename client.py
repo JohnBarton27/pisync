@@ -58,9 +58,12 @@ def connect_to_server():
             receive_thread.start()
 
             break
-        except ConnectionRefusedError as e:
+        except ConnectionRefusedError:
             print('Unable to hit server...')
             time.sleep(2)
+        except OSError:
+            print("Lost established connection to server!")
+            return
 
     client_socket.close()
 
