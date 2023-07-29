@@ -229,7 +229,7 @@ def handle_client(client_socket, client_address):
             if isinstance(message, ClientMediaDumpMessage):
                 print(f'Received dump of media info from client at {client_address}')
                 media_objs = message.get_content()
-                Media.load_media_into_db_from_client(media_objs)
+                Media.load_media_into_db_from_client(media_objs, client_for_socket.db_id)
             else:
                 print(f'Received message from {client_address}')
 

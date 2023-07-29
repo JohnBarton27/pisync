@@ -49,8 +49,9 @@ class Media(BaseModel, ABC):
         conn.close()
 
     @classmethod
-    def load_media_into_db_from_client(cls, client_media: list):
+    def load_media_into_db_from_client(cls, client_media: list, source_client_id: int):
         for media in client_media:
+            media.client_id = source_client_id
             if not media.exists_in_database():
                 media.insert_to_db()
 
