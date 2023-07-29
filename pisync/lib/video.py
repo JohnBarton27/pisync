@@ -21,6 +21,6 @@ class Video(Media):
         # start playing video
         media_player.play()
 
-        time.sleep(2)
+        time.sleep(5)
 
         media_player.stop()

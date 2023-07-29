@@ -64,6 +64,16 @@ class Cue(BaseModel):
         return None
 
     @classmethod
+    def get_for_source_media(cls, src_media):
+        # TODO switch to SQL SELECT
+        cues_to_watch_for = []
+        for cue in cls.get_all_from_db():
+            if cue.source_media_id == src_media.db_id:
+                cues_to_watch_for.append(cue)
+
+        return cues_to_watch_for
+
+    @classmethod
     def get_all_from_db(cls):
         conn = cls.get_db_conn()
         conn.row_factory = sqlite3.Row
