@@ -14,6 +14,7 @@ class Message:
 
     def send(self):
         message = pickle.dumps(self)
+        print(f'Sending {message}...')
         self.socket.send(message)
 
 
