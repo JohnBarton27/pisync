@@ -69,7 +69,7 @@ class Cue(BaseModel):
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
 
-        select_query = "SELECT * FROM cue"
+        select_query = "SELECT * FROM cues"
         cursor.execute(select_query)
         results = cursor.fetchall()
 

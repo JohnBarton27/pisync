@@ -35,14 +35,12 @@
 
     <h2>Cues</h2>
     <div class="list">
+        {% for cue in existing_cues %}
         <div class="list-item">
-            <span class="item-name">Cue 1</span>
+            <span class="item-name">{{ cue.name }}</span>
             <button class="button play-button">Play</button>
         </div>
-        <div class="list-item">
-            <span class="item-name">Cue 2</span>
-            <button class="button play-button">Play</button>
-        </div>
+        {% endfor %}
         <button class="button" onclick="open_add_cue_modal()">Add Cue</button>
     </div>
 </div>

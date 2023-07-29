@@ -57,6 +57,7 @@ document.getElementById("mediaCueForm").addEventListener("submit", function (eve
                 addCueModal.style.display = 'none';
 
                 response.json().then(data => {
+                    // TODO show new cue on HTML page
                     console.log(data)
                 });
 
