@@ -1,6 +1,7 @@
 fastapi
 jinja2
 pygame
+python-vlc
 requests
 sqlalchemy
 uvicorn

@@ -100,6 +100,8 @@ class Media(BaseModel, ABC):
     @classmethod
     def get_from_db_result(cls, result):
         from pisync.lib.audio import Audio
+        from pisync.lib.video import Video
+
         file_path = result['file_path']
         name = result['file_name']
         db_id = result['id']
@@ -109,7 +111,7 @@ class Media(BaseModel, ABC):
         if file_type == MediaTypes.AUDIO:
             return Audio(file_path=file_path, name=name, db_id=db_id, client_id=client_id)
         elif file_type == MediaTypes.VIDEO:
-            print('VIDEO NOT YET SUPPORTED')
+            return Video(file_path=file_path, name=name, db_id=db_id, client_id=client_id)
 
     @classmethod
     def get_db_conn(cls):
@@ -122,6 +124,8 @@ class Media(BaseModel, ABC):
     @classmethod
     def get_all_local_files(cls):
         from pisync.lib.audio import Audio
+        from pisync.lib.video import Video
+
         media_dir = os.path.join(os.getcwd(), 'media')
         file_list = []
 
@@ -134,7 +138,7 @@ class Media(BaseModel, ABC):
                 if file_type == MediaTypes.AUDIO:
                     file_list.append(Audio(file_path=file_path, name=file_path))
                 elif file_type == MediaTypes.VIDEO:
-                    print('VIDEO NOT YET SUPPORTED')
+                    file_list.append(Video(file_path=file_path, name=file_path))
 
         return file_list
 
