@@ -10,6 +10,7 @@ import time
 import uvicorn
 
 from pisync.lib.api.info_response import InfoResponse
+from pisync.lib.media import Media
 import settings
 
 app = FastAPI()
@@ -43,6 +44,10 @@ def connect_to_server():
             print('Connected to the server:', server_ip, settings.SOCKET_PORT)
             
             send_message('Hello, server!')
+
+            media = Media.get_all_from_db()
+
+            send_message(media[0].name)
 
             # Continually receive data
             receive_thread = threading.Thread(target=receive_message)
