@@ -82,6 +82,15 @@ class Media(BaseModel, ABC):
         return None
 
     @classmethod
+    def get_by_file_path(cls, file_path: str):
+        # TODO switch to SQL SELECT
+        for media in cls.get_all_from_db():
+            if media.file_path == file_path:
+                return media
+
+        return None
+
+    @classmethod
     def get_all_from_db(cls):
         conn = cls.get_db_conn()
         conn.row_factory = sqlite3.Row

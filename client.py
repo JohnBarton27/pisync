@@ -37,6 +37,18 @@ def get_server_info():
     return InfoResponse(is_client=True)
 
 
+@app.post("/play/{file_path}")
+def play_media(file_path: int):
+    media = Media.get_by_file_path(file_path)
+
+    if media.client_id:
+        raise Exception('This is a client - cannot play remote media!')
+
+    print(f"Playing local media ({media.name})...")
+    media.play()
+    return
+
+
 def connect_to_server():
     # Connect to the server
     server_ip = '192.168.1.115'  # TODO remove hardcoded server IP

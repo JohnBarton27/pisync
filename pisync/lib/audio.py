@@ -1,7 +1,14 @@
 import pygame
+import requests
 import threading
+from urllib.parse import urlparse
+from urllib.request import pathname2url
 
+from pisync.lib.client import Client
 from pisync.lib.media import Media
+from pisync.lib.message import MediaPlayRequestMessage
+
+import settings
 
 
 class Audio(Media):
@@ -31,10 +38,16 @@ class Audio(Media):
                     if timestamps[timestamp].get('played'):
                         continue
 
-                    # TODO make work for remote media
                     timestamps[timestamp]['played'] = True
-                    cue_thread = threading.Thread(target=timestamps[timestamp]['media'].play)
-                    cue_thread.start()
+                    target_media = timestamps[timestamp]['media']
+
+                    if target_media.client_id:
+                        client_obj = Client.get_by_id(target_media.client_id)
+                        requests.post(f'http://{client_obj.ip_address}:{settings.API_PORT}/play/{urlparse(target_media.file_path)}')
+                    else:
+                        # Local
+                        cue_thread = threading.Thread(target=target_media.play)
+                        cue_thread.start()
 
             if end_time and current_time >= end_time:
                 pygame.mixer.music.stop()
