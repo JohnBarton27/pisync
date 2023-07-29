@@ -5,6 +5,7 @@ from pydantic import BaseModel
 import sqlite3
 from typing import Optional
 
+from pisync.lib.client import Client
 import settings
 
 
@@ -23,6 +24,13 @@ class Media(BaseModel, ABC):
     @abstractmethod
     def play(self, start_time: int = 0, end_time: int = None):
         pass
+
+    @property
+    def client(self):
+        if not self.client_id:
+            return None
+
+        return Client.get_by_id(self.client_id)
 
     def exists_in_database(self):
         conn = self.__class__.get_db_conn()
