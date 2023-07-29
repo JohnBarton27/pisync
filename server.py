@@ -140,15 +140,6 @@ def update_media(media_update: MediaUpdateRequest):
     return media
 
 
-@app.get("/play")
-def play():
-    from pisync.lib.audio import Audio
-    full_audio_track = Audio(file_path='/home/john/git/pisync/media/HauntedMansion_Audio.mp3', name='HM Audio')
-    t1 = threading.Thread(target=full_audio_track.play, kwargs={'start_time': 10, 'end_time': 13})
-    t1.start()
-    print('Finished playing!')
-
-
 def setup_db():
     # Setup DB
     database_file = app.state.db_name
