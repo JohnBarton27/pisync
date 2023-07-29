@@ -222,8 +222,9 @@ def handle_client(client_socket, client_address):
                 break
 
             # Process received data
-            message = data.decode()
-            print('Received message from {}: {}'.format(client_address, message))
+            media_on_client = data
+            print(media_on_client)
+            print(f'Received message from {client_address}')
 
         except ConnectionResetError:
             # Client forcibly closed the connection
