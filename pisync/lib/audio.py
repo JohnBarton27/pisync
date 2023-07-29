@@ -43,7 +43,7 @@ class Audio(Media):
 
                     if target_media.client_id:
                         client_obj = Client.get_by_id(target_media.client_id)
-                        requests.post(f'http://{client_obj.ip_address}:{settings.API_PORT}/play/{urlparse(target_media.file_path)}')
+                        requests.post(f'http://{client_obj.ip_address}:{settings.API_PORT}/play/{target_media.file_path}')
                     else:
                         # Local
                         cue_thread = threading.Thread(target=target_media.play)
