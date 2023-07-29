@@ -18,6 +18,7 @@ from pisync.lib.api.info_response import InfoResponse
 from pisync.lib.api.media_update_request import MediaUpdateRequest
 from pisync.lib.client import Client as ClientObj
 from pisync.lib.media import Media
+from pisync.lib.message import Message, ClientMediaDumpMessage
 
 import settings
 
@@ -185,7 +186,7 @@ def setup_db():
 
     # Find all media files in the 'media' folder
     from pisync.lib.media import Media
-    media_files = Media.get_all_files()
+    media_files = Media.get_all_local_files()
 
     # Check if each file exists in the database, and if not, add it
     for media in media_files:
@@ -223,9 +224,14 @@ def handle_client(client_socket, client_address):
                 break
 
             # Process received data
-            media_on_client = pickle.loads(data)
-            print(media_on_client)
-            print(f'Received message from {client_address}')
+            message = Message.get_from_socket(data)
+
+            if isinstance(message, ClientMediaDumpMessage):
+                print(f'Received dump of media info from client at {client_address}')
+                media_objs = message.get_content()
+                Media.load_media_into_db_from_client(media_objs)
+            else:
+                print(f'Received message from {client_address}')
 
         except ConnectionResetError:
             # Client forcibly closed the connection
@@ -267,6 +273,10 @@ def connect_to_clients():
         client.update_online_status(False)
 
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # TODO FOR DEV USE
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    # TODO END FOR DEV USE
 
     # Bind the socket to a specific IP address and port
     server_ip = '192.168.1.115'  # TODO remove hardcoded server IP

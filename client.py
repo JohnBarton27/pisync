@@ -117,7 +117,7 @@ def setup_db():
 
     # Find all media files in the 'media' folder
     from pisync.lib.media import Media
-    media_files = Media.get_all_files()
+    media_files = Media.get_all_local_files()
 
     # Check if each file exists in the database, and if not, add it
     for media in media_files:

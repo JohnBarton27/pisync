@@ -17,6 +17,7 @@ class Media(BaseModel, ABC):
     file_path: str = None
     name: str = None
     db_id: int = None
+    client_id: int = None
 
     @abstractmethod
     def play(self, start_time: int = 0, end_time: int = None):
@@ -25,8 +26,13 @@ class Media(BaseModel, ABC):
     def exists_in_database(self):
         conn = self.__class__.get_db_conn()
         cursor = conn.cursor()
-        select_query = "SELECT file_path FROM media WHERE file_path = ?"
-        cursor.execute(select_query, (self.file_path,))
+        if not self.client_id:
+            select_query = "SELECT file_path FROM media WHERE file_path = ? AND client_id IS NULL"
+            cursor.execute(select_query, (self.file_path,))
+        else:
+            select_query = "SELECT file_path FROM media WHERE file_path = ? AND client_id = ?"
+            cursor.execute(select_query, (self.file_path, self.client_id))
+
         result = cursor.fetchone()
         conn.close()
         return result is not None
@@ -36,10 +42,18 @@ class Media(BaseModel, ABC):
         conn = self.__class__.get_db_conn()
         cursor = conn.cursor()
 
-        insert_query = "INSERT INTO media (file_path, file_name, file_type) VALUES (?, ?, ?)"
-        cursor.execute(insert_query, (self.file_path, self.name, MediaTypes.AUDIO.value if isinstance(self, Audio) else MediaTypes.VIDEO.value))
+        insert_query = "INSERT INTO media (file_path, file_name, file_type, client_id) VALUES (?, ?, ?, ?)"
+        cursor.execute(insert_query, (self.file_path, self.name, MediaTypes.AUDIO.value if isinstance(self, Audio) else MediaTypes.VIDEO.value, self.client_id))
         conn.commit()
         conn.close()
+
+    @classmethod
+    def load_media_into_db_from_client(cls, client_media: list):
+        for media in client_media:
+            if not media.exists_in_database():
+                media.insert_to_db()
+
+            # TODO handle name updates/etc.
 
     def update_name(self, new_name: str):
         conn = self.__class__.get_db_conn()
@@ -80,9 +94,10 @@ class Media(BaseModel, ABC):
         name = result['file_name']
         db_id = result['id']
         file_type = MediaTypes.AUDIO if result['file_type'] == MediaTypes.AUDIO.value else MediaTypes.VIDEO
+        client_id = result['client_id']
 
         if file_type == MediaTypes.AUDIO:
-            return Audio(file_path=file_path, name=name, db_id=db_id)
+            return Audio(file_path=file_path, name=name, db_id=db_id, client_id=client_id)
         elif file_type == MediaTypes.VIDEO:
             print('VIDEO NOT YET SUPPORTED')
 
@@ -95,7 +110,7 @@ class Media(BaseModel, ABC):
         return sqlite3.connect(database_file)
 
     @classmethod
-    def get_all_files(cls):
+    def get_all_local_files(cls):
         from pisync.lib.audio import Audio
         media_dir = os.path.join(os.getcwd(), 'media')
         file_list = []
