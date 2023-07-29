@@ -43,7 +43,7 @@
             <span class="item-name">Cue 2</span>
             <button class="button play-button">Play</button>
         </div>
-        <button class="button">Add Cue</button>
+        <button class="button" onclick="open_add_cue_modal()">Add Cue</button>
     </div>
 </div>
 
@@ -70,6 +70,39 @@
     </div>
 </div>
 
+<!-- Add Cue Modal -->
+<div id="addCueModal" class="modal">
+    <div class="modal-content">
+        <span id="addCueModalClose" class="close-button">&times;</span>
+        <h2>Media Cue Builder</h2>
+        <form id="mediaCueForm">
+            <label for="cueName">Name:</label>
+            <input type="text" id="cueName" name="cueName" required><br><br>
+
+            <label for="sourceMedia">Source Media:</label>
+            <select id="sourceMedia" name="sourceMedia" required>
+                {% for media in existing_media %}
+                <option value="{{ media.db_id }}">{{ media.name }}</option>
+                {% endfor %}
+            </select><br><br>
+
+            <label for="sourceMediaTimecode">Source Media Timecode (in seconds):</label>
+            <input type="number" id="sourceMediaTimecode" name="sourceMediaTimecode" required><br><br>
+
+            <label for="targetMedia">Target Media:</label>
+            <select id="targetMedia" name="targetMedia" required>
+                {% for media in existing_media %}
+                <option value="{{ media.db_id }}">{{ media.name }}</option>
+                {% endfor %}
+            </select><br><br>
+
+            <input type="submit" value="Create Media Cue">
+        </form>
+        <button id="addCueBtn" type="submit" class="button" style="display:none;">Connect</button>
+    </div>
+</div>
+
+<script src="{{ url_for('static', path='/js/cues.js') }}"></script>
 <script src="{{ url_for('static', path='/js/index_media.js') }}"></script>
 <script src="{{ url_for('static', path='/js/index_clients.js') }}"></script>
 <script src="{{ url_for('static', path='/js/sockets.js') }}"></script>

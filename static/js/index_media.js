@@ -52,7 +52,7 @@ editMediaForm.addEventListener('submit', function(event) {
     // Create JSON body
     const requestBody = JSON.stringify({ name: newName, db_id: CURRENT_MEDIA_ID });
 
-    // Send POST request
+    // Send PUT request
     fetch(`/media/update`, {
         method: 'PUT',
         headers: {
