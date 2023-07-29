@@ -50,8 +50,8 @@ def connect_to_server():
             media_objs = Media.get_all_from_db()
             media_pickle = pickle.dumps(media_objs)
 
-            opening_message = ClientMediaDumpMessage(client_socket, media_pickle)
-            opening_message.send()
+            opening_message = ClientMediaDumpMessage(media_pickle)
+            opening_message.send(client_socket)
 
             # Continually receive data
             receive_thread = threading.Thread(target=receive_message)
