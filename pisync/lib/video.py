@@ -1,3 +1,4 @@
+from moviepy.editor import VideoFileClip
 import time
 import vlc
 
@@ -21,8 +22,15 @@ class Video(Media):
         # start playing video
         media_player.play()
 
-        time.sleep(1)  # Make sure video has started
-        vid_length_millis = media_player.get_length()
-        time.sleep((vid_length_millis / 1000) - 1)
+        time.sleep(self.duration)
 
         media_player.stop()
+
+    @property
+    def duration(self):
+        try:
+            clip = VideoFileClip(self.file_path)
+            return clip.duration
+        except Exception as e:
+            print(f"Error while getting video duration: {e}")
+            return None
