@@ -19,7 +19,7 @@ class Media(BaseModel, ABC):
     file_path: str = None
     name: str = None
     db_id: int = None
-    client_id: Optional[int] = None,
+    client_id: Optional[int] = None
     start_timecode: Optional[float] = None
     end_timecode: Optional[float] = None
 
