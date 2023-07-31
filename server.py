@@ -186,7 +186,6 @@ def setup():
     connect_to_clients(app)
 
 
-setup()
-
 if __name__ == "__main__":
+    setup()
     uvicorn.run(app, host="0.0.0.0", port=settings.API_PORT, reload=False)
