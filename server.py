@@ -23,6 +23,7 @@ from pisync.lib.media import Media
 from pisync.lib.message import Message, ClientMediaDumpMessage, MediaPlayRequestMessage
 
 import settings
+from setup_db import setup_server_db
 
 
 app = FastAPI()
@@ -165,63 +166,6 @@ def create_cue(cue_creation: CreateCueRequest):
     return cue
 
 
-def setup_db():
-    # Setup DB
-    database_file = app.state.db_name
-    app.db_conn = sqlite3.connect(database_file)
-    app.db_cursor = app.db_conn.cursor()
-
-    # Define the Media table
-    create_table_query = """
-    CREATE TABLE IF NOT EXISTS media (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        file_path TEXT UNIQUE,
-        file_name TEXT UNIQUE,
-        file_type TEXT,
-        client_id INTEGER
-    )
-    """
-    app.db_cursor.execute(create_table_query)
-
-    # Define the Clients table
-    create_table_query = """
-    CREATE TABLE IF NOT EXISTS clients (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        hostname TEXT UNIQUE,
-        friendly_name TEXT UNIQUE,
-        ip_address TEXT,
-        is_online INTEGER
-    )
-    """
-    app.db_cursor.execute(create_table_query)
-
-    # Define the Cues table
-    create_table_query = """
-    CREATE TABLE IF NOT EXISTS cues (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        friendly_name TEXT UNIQUE,
-        source_media_id INT NOT NULL,
-        source_media_timecode_secs REAL NOT NULL,
-        target_media_id INT
-    )
-    """
-    app.db_cursor.execute(create_table_query)
-
-    # Create the 'media' folder if it doesn't exist
-    media_dir = os.path.join(os.getcwd(), 'media')
-    if not os.path.exists(media_dir):
-        os.makedirs(media_dir)
-
-    # Find all media files in the 'media' folder
-    from pisync.lib.media import Media
-    media_files = Media.get_all_local_files()
-
-    # Check if each file exists in the database, and if not, add it
-    for media in media_files:
-        if not media.exists_in_database():
-            media.insert_to_db()
-
-
 async def tell_frontend_client_connection_event(client: ClientObj):
     for fe_client in connected_clients:
         await fe_client.send_text(json.dumps({'text': 'CLIENT CONNECTION EVENT', 'connected': client.is_online, 'ipAddress': client.ip_address, 'name': client.friendly_name}))
@@ -344,7 +288,7 @@ def setup():
     # Mount static files
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
-    setup_db()
+    setup_server_db()
 
     connect_to_clients()
 
