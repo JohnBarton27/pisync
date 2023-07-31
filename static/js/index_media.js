@@ -50,12 +50,25 @@ window.addEventListener('click', function(event) {
 editMediaForm.addEventListener('submit', function(event) {
     event.preventDefault();
 
-    // Fetch media ID and name from the form
+    // Get data from the form
     const nameInput = document.getElementById('name');
     const newName = nameInput.value;
 
+    const startTimeInput = document.getElementById('startMediaTimecode');
+    const startTime = startTimeInput.value;
+
+    const endTimeInput = document.getElementById('endMediaTimecode');
+    const endTime = endTimeInput.value;
+
+    const mediaUpdateRequest = {
+        name: newName,
+        db_id: CURRENT_MEDIA_ID,
+        start_time: startTime,
+        end_time: endTime
+    }
+
     // Create JSON body
-    const requestBody = JSON.stringify({ name: newName, db_id: CURRENT_MEDIA_ID });
+    const requestBody = JSON.stringify(mediaUpdateRequest);
 
     // Send PUT request
     fetch(`/media/update`, {

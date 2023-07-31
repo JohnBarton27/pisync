@@ -72,11 +72,11 @@ class Media(BaseModel, ABC):
 
             # TODO handle name updates/etc.
 
-    def update_name(self, new_name: str):
+    def update(self, new_name: str, new_start_time: float, new_end_time: float):
         conn = self.__class__.get_db_conn()
         cursor = conn.cursor()
-        update_query = "UPDATE media SET file_name = ? WHERE id = ?"
-        cursor.execute(update_query, (new_name, self.db_id))
+        update_query = "UPDATE media SET file_name = ?, start_timecode = ?, end_timecode = ? WHERE id = ?"
+        cursor.execute(update_query, (new_name, new_start_time, new_end_time, self.db_id))
         conn.commit()
         conn.close()
 

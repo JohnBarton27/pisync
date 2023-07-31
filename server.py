@@ -146,7 +146,7 @@ def play_media(media_id: int):
 @app.put("/media/update")
 def update_media(media_update: MediaUpdateRequest):
     media = Media.get_by_id(media_update.db_id)
-    media.update_name(media_update.name)
+    media.update(media_update.name)
 
     media = Media.get_by_id(media_update.db_id)
     return media
