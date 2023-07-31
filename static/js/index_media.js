@@ -83,9 +83,15 @@ editMediaForm.addEventListener('submit', function(event) {
 
     const mediaUpdateRequest = {
         name: newName,
-        db_id: CURRENT_MEDIA_ID,
-        start_time: startTime,
-        end_time: endTime
+        db_id: CURRENT_MEDIA_ID
+    }
+
+    if (startTime.trim() !== '') {
+        mediaUpdateRequest.start_time = startTime;
+    }
+
+    if (endTime.trim() !== '') {
+        mediaUpdateRequest.end_time = endTime;
     }
 
     // Create JSON body
