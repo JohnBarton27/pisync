@@ -15,10 +15,15 @@ const editButtons = document.getElementsByClassName('edit-media-btn');
 for (let i = 0; i < editButtons.length; i++) {
     const editButton = editButtons[i];
 
-    // Add click event listener to each edit button
+    // Open Edit Media Modal
     editButton.addEventListener('click', function() {
         CURRENT_MEDIA_ID = this.getAttribute('data-media-id');
+        const mediaFilePath = this.getAttribute('data-media-filepath')
         const mediaName = this.getAttribute('data-media-name');
+
+        // Populate filepath text
+        const filepathElem = document.getElementById('editMediaFilepath');
+        filepathElem.textContent = mediaFilePath;
 
         // Populate the modal form with media name
         const nameInput = document.getElementById('name');

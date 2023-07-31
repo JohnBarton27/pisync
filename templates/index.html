@@ -27,7 +27,7 @@
         <div class="list-item">
             <span{% if media.client and not media.client.is_online %} class="item-name offline-client" {% else %} class="item-name" {% endif %} data-media-id="{{ media.db_id }}" {% if media.client %} data-client-ip="{{ media.client.ip_address }}" {% endif %}>{{media.name}} {% if media.client %}({{media.client.friendly_name}}){% endif %}</span>
             <button class="button play-button" onclick="playMedia(`{{ media.db_id }}`)">Play</button>
-            <button class="button edit-button edit-media-btn" data-media-id="{{ media.db_id }}" data-media-name="{{ media.name }}">Edit</button>
+            <button class="button edit-button edit-media-btn" data-media-id="{{ media.db_id }}" data-media-name="{{ media.name }}" data-media-filepath="{{ media.file_path }}">Edit</button>
         </div>
         {% endfor %}
         <button class="button">Add Media</button>
@@ -50,9 +50,17 @@
     <div class="modal-content">
         <span id="editMediaModalClose" class="close-button">&times;</span>
         <h2>Edit Media</h2>
+        <span>Filepath: <span id="editMediaFilepath"></span></span><br><br>
         <form id="editMediaForm">
             <label for="name">Name:</label>
-            <input type="text" id="name" name="name">
+            <input type="text" id="name" name="name"><br><br>
+
+            <label for="startMediaTimecode">Start Time (in seconds):</label>
+            <input type="text" id="startMediaTimecode" name=startMediaTimecode"><br><br>
+
+            <label for="endMediaTimecode">End Time (in seconds):</label>
+            <input type="text" id="endMediaTimecode" name=endMediaTimecode"><br><br>
+
             <button type="submit" class="button">Save</button>
         </form>
     </div>
