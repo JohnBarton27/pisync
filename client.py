@@ -19,11 +19,9 @@ app = FastAPI()
 settings.APP_TYPE = 'client'
 templates = Jinja2Templates(directory="templates")
 
-# Create a socket object
-
 # Threads
 stop_flag = threading.Event()
-active_threads = []
+app.active_threads = []
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -90,12 +88,18 @@ def connect_to_server():
 
     recv_thread = threading.Thread(target=receive_server_messages)
     recv_thread.start()
-    active_threads.append(recv_thread)
+    app.active_threads.append(recv_thread)
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
     stop_flag.is_set()
+
+    for thread in app.active_threads:
+        print(f"CLOSING {thread}...")
+        thread.join()
+
+    print("READY FOR SHUTDOWN.")
 
 
 def setup():
