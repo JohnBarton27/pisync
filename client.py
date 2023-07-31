@@ -2,10 +2,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import os
 import pickle
 import socket
-import sqlite3
 import threading
 import time
 import uvicorn
@@ -13,10 +11,11 @@ import uvicorn
 from pisync.lib.api.info_response import InfoResponse
 from pisync.lib.media import Media
 from pisync.lib.message import Message, ClientMediaDumpMessage, MediaPlayRequestMessage
+
+from setup_db import setup_client_db
 import settings
 
 app = FastAPI()
-app.state.db_name = 'pisync_client.db'
 settings.APP_TYPE = 'client'
 templates = Jinja2Templates(directory="templates")
 
@@ -99,40 +98,8 @@ async def shutdown_event():
     stop_flag.is_set()
 
 
-def setup_db():
-    # Setup DB
-    database_file = app.state.db_name
-    app.db_conn = sqlite3.connect(database_file)
-    app.db_cursor = app.db_conn.cursor()
-
-    # Define the Media table
-    create_table_query = """
-    CREATE TABLE IF NOT EXISTS media (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        file_path TEXT UNIQUE,
-        file_name TEXT UNIQUE,
-        file_type TEXT
-    )
-    """
-    app.db_cursor.execute(create_table_query)
-
-    # Create the 'media' folder if it doesn't exist
-    media_dir = os.path.join(os.getcwd(), 'media')
-    if not os.path.exists(media_dir):
-        os.makedirs(media_dir)
-
-    # Find all media files in the 'media' folder
-    from pisync.lib.media import Media
-    media_files = Media.get_all_local_files()
-
-    # Check if each file exists in the database, and if not, add it
-    for media in media_files:
-        if not media.exists_in_database():
-            media.insert_to_db()
-
-
 def setup():
-    setup_db()
+    setup_client_db()
 
     # Mount static files
     app.mount("/static", StaticFiles(directory="static"), name="static")

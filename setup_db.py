@@ -2,17 +2,34 @@ import os
 import sqlite3
 
 
-def setup_media_table(cursor):
+def setup_media_table(cursor, is_server: bool):
+    """
+    Creates the 'media' table in the database and populates it with any found local media
+
+    :param cursor: Database cursor - used to execute SQL commands against the proper DB
+    :param is_server: bool - if True, adds the 'client_id' field to the database
+    :return: None
+    """
     # Define the Media table
-    create_table_query = """
-    CREATE TABLE IF NOT EXISTS media (
+    column_defs = """
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         file_path TEXT UNIQUE,
         file_name TEXT UNIQUE,
-        file_type TEXT,
-        client_id INTEGER
+        file_type TEXT
+    """
+
+    if is_server:
+        column_defs = f"""
+            {column_defs},
+            client_id INTEGER
+        """
+
+    create_table_query = f"""
+    CREATE TABLE IF NOT EXISTS media (
+        {column_defs}
     )
     """
+
     cursor.execute(create_table_query)
 
     # Create the 'media' folder if it doesn't exist
@@ -36,7 +53,7 @@ def setup_server_db():
     db_conn = sqlite3.connect(database_file)
     db_cursor = db_conn.cursor()
 
-    setup_media_table(db_cursor)
+    setup_media_table(db_cursor, is_server=True)
 
     # Define the Clients table
     create_table_query = """
@@ -61,3 +78,12 @@ def setup_server_db():
     )
     """
     db_cursor.execute(create_table_query)
+
+
+def setup_client_db():
+    # Setup DB
+    database_file = 'pisync_client.db'
+    db_conn = sqlite3.connect(database_file)
+    db_cursor = db_conn.cursor()
+
+    setup_media_table(db_cursor, is_server=False)
