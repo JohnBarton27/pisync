@@ -19,7 +19,9 @@ class Media(BaseModel, ABC):
     file_path: str = None
     name: str = None
     db_id: int = None
-    client_id: Optional[int] = None
+    client_id: Optional[int] = None,
+    start_timecode: Optional[float] = None
+    end_timecode: Optional[float] = None
 
     @abstractmethod
     def play(self, start_time: int = 0, end_time: int = None):
@@ -51,8 +53,13 @@ class Media(BaseModel, ABC):
         conn = self.__class__.get_db_conn()
         cursor = conn.cursor()
 
-        insert_query = "INSERT INTO media (file_path, file_name, file_type, client_id) VALUES (?, ?, ?, ?)"
-        cursor.execute(insert_query, (self.file_path, self.name, MediaTypes.AUDIO.value if isinstance(self, Audio) else MediaTypes.VIDEO.value, self.client_id))
+        insert_query = "INSERT INTO media (file_path, file_name, file_type, client_id, start_timecode, end_timecode) VALUES (?, ?, ?, ?, ?, ?)"
+        cursor.execute(insert_query, (self.file_path,
+                                      self.name,
+                                      MediaTypes.AUDIO.value if isinstance(self, Audio) else MediaTypes.VIDEO.value,
+                                      self.client_id,
+                                      self.start_timecode,
+                                      self.end_timecode))
         conn.commit()
         conn.close()
 
@@ -111,16 +118,21 @@ class Media(BaseModel, ABC):
         from pisync.lib.audio import Audio
         from pisync.lib.video import Video
 
-        file_path = result['file_path']
-        name = result['file_name']
-        db_id = result['id']
         file_type = MediaTypes.AUDIO if result['file_type'] == MediaTypes.AUDIO.value else MediaTypes.VIDEO
-        client_id = result['client_id']
+
+        common_args = {
+            "file_path": result['file_path'],
+            "name": result['file_name'],
+            "db_id": result['id'],
+            "client_id": result['client_id'],
+            "start_timecode": result['start_timecode'],
+            "end_timecode": result['end_timecode']
+        }
 
         if file_type == MediaTypes.AUDIO:
-            return Audio(file_path=file_path, name=name, db_id=db_id, client_id=client_id)
+            return Audio(**common_args)
         elif file_type == MediaTypes.VIDEO:
-            return Video(file_path=file_path, name=name, db_id=db_id, client_id=client_id)
+            return Video(**common_args)
 
     @classmethod
     def get_db_conn(cls):
@@ -144,10 +156,15 @@ class Media(BaseModel, ABC):
             if os.path.isfile(file_path):
                 file_type = cls.get_file_type(file_name)
 
+                common_args = {
+                    "file_path": file_path,
+                    "name": file_path
+                }
+
                 if file_type == MediaTypes.AUDIO:
-                    file_list.append(Audio(file_path=file_path, name=file_path))
+                    file_list.append(Audio(**common_args))
                 elif file_type == MediaTypes.VIDEO:
-                    file_list.append(Video(file_path=file_path, name=file_path))
+                    file_list.append(Video(**common_args))
 
         return file_list
 

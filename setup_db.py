@@ -15,7 +15,9 @@ def setup_media_table(cursor, is_server: bool):
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         file_path TEXT UNIQUE,
         file_name TEXT UNIQUE,
-        file_type TEXT
+        file_type TEXT,
+        start_timecode REAL,
+        end_timecode REAL
     """
 
     if is_server:
