@@ -34,7 +34,7 @@ def connect_to_clients(app):
     print('Socket server listening on {}:{}'.format(server_ip, settings.SOCKET_PORT))
 
     # Start the socket server in a separate thread
-    socket_thread = threading.Thread(target=start_socket_server, args=(server_socket,app))
+    socket_thread = threading.Thread(target=start_socket_server, args=(server_socket, app))
     socket_thread.start()
     app.active_threads.append(socket_thread)
 
