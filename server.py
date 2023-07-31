@@ -24,7 +24,6 @@ from setup_db import setup_server_db
 
 
 app = FastAPI()
-app.state.db_name = 'pisync.db'
 settings.APP_TYPE = 'server'
 templates = Jinja2Templates(directory="templates")
 
