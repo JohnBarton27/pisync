@@ -6,7 +6,7 @@ from pisync.lib.media import Media
 
 
 class Video(Media):
-    def play(self, start_time: int = 0, end_time: int = None):
+    def play(self):
         #  creating vlc media player object
         media_player = vlc.MediaPlayer()
 

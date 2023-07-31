@@ -11,6 +11,11 @@ let CURRENT_MEDIA_ID = null;
 // Get the buttons that open the edit media modal
 const editButtons = document.getElementsByClassName('edit-media-btn');
 
+// Form Fields
+const EDIT_MEDIA_NAME_INPUT = document.getElementById('name');
+const EDIT_MEDIA_START_TIME_INPUT = document.getElementById('startMediaTimecode');
+const EDIT_MEDIA_END_TIME_INPUT = document.getElementById('endMediaTimecode');
+
 // Iterate through all edit buttons
 for (let i = 0; i < editButtons.length; i++) {
     const editButton = editButtons[i];
@@ -20,14 +25,35 @@ for (let i = 0; i < editButtons.length; i++) {
         CURRENT_MEDIA_ID = this.getAttribute('data-media-id');
         const mediaFilePath = this.getAttribute('data-media-filepath')
         const mediaName = this.getAttribute('data-media-name');
+        let mediaStartTime = this.getAttribute('data-media-start');
+        let mediaEndTime = this.getAttribute('data-media-end');
+
+        if (mediaStartTime === "None") {
+            mediaStartTime = null;
+        }
+
+        if (mediaEndTime === "None") {
+            mediaEndTime = null;
+        }
 
         // Populate filepath text
         const filepathElem = document.getElementById('editMediaFilepath');
         filepathElem.textContent = mediaFilePath;
 
-        // Populate the modal form with media name
-        const nameInput = document.getElementById('name');
-        nameInput.value = mediaName;
+        // Populate the modal form with media name and timecode values
+        EDIT_MEDIA_NAME_INPUT.value = mediaName;
+
+        if (mediaStartTime) {
+            EDIT_MEDIA_START_TIME_INPUT.value = mediaStartTime;
+        } else {
+            EDIT_MEDIA_START_TIME_INPUT.value = null;
+        }
+
+        if (mediaEndTime) {
+            EDIT_MEDIA_END_TIME_INPUT.value = mediaEndTime;
+        } else {
+            EDIT_MEDIA_END_TIME_INPUT.value = null;
+        }
 
         // Open the modal
         editMediaModal.style.display = 'block';
@@ -51,14 +77,9 @@ editMediaForm.addEventListener('submit', function(event) {
     event.preventDefault();
 
     // Get data from the form
-    const nameInput = document.getElementById('name');
-    const newName = nameInput.value;
-
-    const startTimeInput = document.getElementById('startMediaTimecode');
-    const startTime = startTimeInput.value;
-
-    const endTimeInput = document.getElementById('endMediaTimecode');
-    const endTime = endTimeInput.value;
+    const newName = EDIT_MEDIA_NAME_INPUT.value;
+    const startTime = EDIT_MEDIA_START_TIME_INPUT.value;
+    const endTime = EDIT_MEDIA_END_TIME_INPUT.value;
 
     const mediaUpdateRequest = {
         name: newName,

@@ -24,7 +24,7 @@ class Media(BaseModel, ABC):
     end_timecode: Optional[float] = None
 
     @abstractmethod
-    def play(self, start_time: int = 0, end_time: int = None):
+    def play(self):
         pass
 
     @property
