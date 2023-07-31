@@ -1,9 +1,7 @@
-import asyncio
 from fastapi import FastAPI, Request, WebSocket
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import json
 import requests
 import socket
 import threading
@@ -17,7 +15,9 @@ from pisync.lib.api.media_update_request import MediaUpdateRequest
 from pisync.lib.client import Client as ClientObj
 from pisync.lib.cue import Cue
 from pisync.lib.media import Media
-from pisync.lib.message import Message, ClientMediaDumpMessage, MediaPlayRequestMessage
+from pisync.lib.message import MediaPlayRequestMessage
+
+from pisync.socket_handlers.server import connect_to_clients
 
 import settings
 from setup_db import setup_server_db
@@ -28,17 +28,17 @@ settings.APP_TYPE = 'server'
 templates = Jinja2Templates(directory="templates")
 
 # Threads
-stop_flag = threading.Event()
-active_threads = []
+app.stop_flag = threading.Event()
+app.active_threads = []
 
-connected_clients = set()
-client_sockets = []
+app.connected_clients = set()
+app.client_sockets = []
 
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    connected_clients.add(websocket)
+    app.connected_clients.add(websocket)
 
     try:
         while True:
@@ -46,7 +46,7 @@ async def websocket_endpoint(websocket: WebSocket):
             # Handle incoming messages from the client if needed
             pass
     except:
-        connected_clients.remove(websocket)
+        app.connected_clients.remove(websocket)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -132,7 +132,7 @@ def play_media(media_id: int):
     if media.client_id:
         client_obj = ClientObj.get_by_id(media.client_id)
         print(f'Looking for client {client_obj.hostname}...')
-        for cli_socket in client_sockets:
+        for cli_socket in app.client_sockets:
             if cli_socket.getpeername()[0] == client_obj.ip_address:
                 message = MediaPlayRequestMessage(media.file_path)
                 message.send(cli_socket)
@@ -162,118 +162,15 @@ def create_cue(cue_creation: CreateCueRequest):
     return cue
 
 
-async def tell_frontend_client_connection_event(client: ClientObj):
-    for fe_client in connected_clients:
-        await fe_client.send_text(json.dumps({'text': 'CLIENT CONNECTION EVENT', 'connected': client.is_online, 'ipAddress': client.ip_address, 'name': client.friendly_name}))
-
-
-def receive_from_client(client_socket, client_address):
-    print('Connected with client:', client_address)
-
-    client_for_socket = ClientObj.get_by_ip_address(client_address[0])
-    client_for_socket.update_online_status(True)
-
-    asyncio.run(tell_frontend_client_connection_event(client_for_socket))
-
-    client_socket.settimeout(1)
-    client_socket.send('HELLO FROM THE SERVER'.encode())
-
-    while not stop_flag.is_set():
-        try:
-            # Receive data from the client
-            data = client_socket.recv(1024)
-            if not data:
-                # Client disconnected
-                print('Client disconnected:', client_address)
-                client_for_socket.update_online_status(False)
-
-                asyncio.run(tell_frontend_client_connection_event(client_for_socket))
-
-                client_socket.close()
-                break
-
-            # Process received data
-            message = Message.get_from_socket(data)
-
-            if isinstance(message, ClientMediaDumpMessage):
-                print(f'Received dump of media info from client at {client_address}')
-                media_objs = message.get_content()
-                Media.load_media_into_db_from_client(media_objs, client_for_socket.db_id)
-            else:
-                print(f'Received message from {client_address}')
-
-        except ConnectionResetError:
-            # Client forcibly closed the connection
-            print('Client forcibly closed the connection:', client_address)
-            client_for_socket.update_online_status(False)
-            client_socket.close()
-            break
-        except socket.timeout:
-            continue
-
-    # Close the client connection
-    client_socket.close()
-    client_sockets.remove(client_socket)
-
-
-def start_socket_server(server_socket):
-    while not stop_flag.is_set():
-        try:
-            # Accept a client connection
-            client_socket, client_address = server_socket.accept()
-            client_sockets.append(client_socket)
-
-            # Start a new thread to handle the client connection
-            client_thread = threading.Thread(
-                target=receive_from_client,
-                args=(client_socket, client_address)
-            )
-            client_thread.start()
-            active_threads.append(client_thread)
-        except socket.timeout:
-            continue
-
-    server_socket.close()
-
-
-def connect_to_clients():
-    clients = ClientObj.get_all_from_db()
-
-    # Start all clients as offline until they connect
-    for client in clients:
-        client.update_online_status(False)
-
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # TODO FOR DEV USE
-    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    # TODO END FOR DEV USE
-
-    # Bind the socket to a specific IP address and port
-    server_ip = '192.168.1.115'  # TODO remove hardcoded server IP
-    server_socket.settimeout(1)
-    server_socket.bind((server_ip, settings.SOCKET_PORT))
-
-    # Listen for incoming connections
-    server_socket.listen()
-
-    print('Socket server listening on {}:{}'.format(server_ip, settings.SOCKET_PORT))
-
-    # Start the socket server in a separate thread
-    socket_thread = threading.Thread(target=start_socket_server, args=(server_socket,))
-    socket_thread.start()
-    active_threads.append(socket_thread)
-
-
 @app.on_event("shutdown")
 async def shutdown_event():
     print("STARTING SHUTDOWN...")
     # Set the stop flag to signal threads to stop
-    stop_flag.set()
+    app.stop_flag.set()
 
     print("CLOSING ACTIVE THREADS...")
     # Wait for threads to finish before exiting
-    for thread in active_threads:
+    for thread in app.active_threads:
         print(f"CLOSING {thread}...")
         thread.join()
 
@@ -286,7 +183,7 @@ def setup():
 
     setup_server_db()
 
-    connect_to_clients()
+    connect_to_clients(app)
 
 
 setup()
