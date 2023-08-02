@@ -66,7 +66,7 @@ def setup():
     socket_thread.start()
 
     # Start VLC
-    Video.open_vlc(fullscreen=False)
+    Video.open_vlc(fullscreen=True)
 
 
 if __name__ == "__main__":
