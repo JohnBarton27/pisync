@@ -6,28 +6,33 @@ from pisync.lib.media import Media
 
 
 class Video(Media):
-    def play(self):
+
+    media_player = None
+
+    @classmethod
+    def open_vlc(cls):
         #  creating vlc media player object
-        media_player = vlc.MediaPlayer()
+        cls.media_player = vlc.MediaPlayer()
 
         # toggling full screen
-        media_player.toggle_fullscreen()
+        cls.media_player.toggle_fullscreen()
 
+    def play(self):
         # media object
         media = vlc.Media(self.file_path)
 
         # setting media to the media player
-        media_player.set_media(media)
+        self.__class__.media_player.set_media(media)
 
         # start playing video
-        media_player.play()
+        self.__class__.media_player.play()
 
         if self.start_timecode:
-            media_player.set_time(int(self.start_timecode * 1000))
+            self.__class__.media_player.set_time(int(self.start_timecode * 1000))
 
         time.sleep(self.duration)
 
-        media_player.stop()
+        self.__class__.media_player.stop()
 
     @property
     def duration(self):
