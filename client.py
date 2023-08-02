@@ -64,7 +64,7 @@ def setup():
 
     socket_thread = threading.Thread(target=connect_to_server, args=(app,))
     socket_thread.start()
-    
+
     # Start VLC
     Video.open_vlc(fullscreen=False)
 

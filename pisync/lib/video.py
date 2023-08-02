@@ -1,5 +1,6 @@
 from moviepy.editor import VideoFileClip
 import time
+from typing import ClassVar
 import vlc
 
 from pisync.lib.media import Media
@@ -7,7 +8,7 @@ from pisync.lib.media import Media
 
 class Video(Media):
 
-    media_player = None
+    media_player: ClassVar = None
 
     @classmethod
     def open_vlc(cls, fullscreen: bool = True):
