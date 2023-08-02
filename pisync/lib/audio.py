@@ -7,6 +7,7 @@ from urllib.request import pathname2url
 from pisync.lib.client import Client
 from pisync.lib.media import Media
 from pisync.lib.message import MediaPlayRequestMessage
+from pisync.lib.video import Video
 
 import settings
 

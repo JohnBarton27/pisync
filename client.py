@@ -7,6 +7,7 @@ import uvicorn
 
 from pisync.lib.api.info_response import InfoResponse
 from pisync.lib.media import Media
+from pisync.lib.video import Video
 
 from pisync.socket_handlers.client import connect_to_server
 
@@ -63,6 +64,9 @@ def setup():
 
     socket_thread = threading.Thread(target=connect_to_server, args=(app,))
     socket_thread.start()
+    
+    # Start VLC
+    Video.open_vlc(fullscreen=False)
 
 
 if __name__ == "__main__":

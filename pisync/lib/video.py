@@ -10,12 +10,12 @@ class Video(Media):
     media_player = None
 
     @classmethod
-    def open_vlc(cls):
+    def open_vlc(cls, fullscreen: bool = True):
         #  creating vlc media player object
         cls.media_player = vlc.MediaPlayer()
 
-        # toggling full screen
-        cls.media_player.toggle_fullscreen()
+        if fullscreen:
+            cls.media_player.toggle_fullscreen()
 
     def play(self):
         # media object
