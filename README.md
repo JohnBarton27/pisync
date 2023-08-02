@@ -39,7 +39,7 @@ ssh <username>@<pi_ip_address>
 Once in a terminal on the Pi, you'll need to do the following:
 ```
 # Install dependencies
-sudo apt install git python3.10-venv ffmpeg net-tools
+sudo apt install git python3.10-venv ffmpeg net-tools vlc
 
 # Clone this repository
 git clone https://github.com/JohnBarton27/pisync.git
