@@ -37,12 +37,15 @@ class Media(BaseModel, ABC):
     def exists_in_database(self):
         conn = self.__class__.get_db_conn()
         cursor = conn.cursor()
+
         if not self.client_id:
             select_query = "SELECT file_path FROM media WHERE file_path = ? AND client_id IS NULL"
-            cursor.execute(select_query, (self.file_path,))
+            select_params = (self.file_path,)
         else:
             select_query = "SELECT file_path FROM media WHERE file_path = ? AND client_id = ?"
-            cursor.execute(select_query, (self.file_path, self.client_id))
+            select_params = (self.file_path, self.client_id)
+
+        cursor.execute(select_query, select_params)
 
         result = cursor.fetchone()
         conn.close()
