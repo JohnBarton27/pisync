@@ -144,6 +144,11 @@ input[type="text"]:focus {
     font-style: italic;
 }
 
+.disabled-cue {
+    color: #aaa;
+    font-style: italic;
+}
+
 form {
     max-width: 400px;
     margin: 0 auto;

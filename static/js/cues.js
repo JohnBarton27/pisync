@@ -169,6 +169,12 @@ editCueForm.addEventListener('submit', function(event) {
                     // Update display name
                     const nameDisplayElem = document.querySelectorAll('[data-cue-id="' + CURRENT_CUE_ID + '"].item-name')[0];
                     nameDisplayElem.innerHTML = data.name;
+
+                    if (data.is_enabled && nameDisplayElem.classList.contains('disabled-cue')) {
+                        nameDisplayElem.classList.remove('disabled-cue');
+                    } else if (!data.is_enabled && !nameDisplayElem.classList.contains('disabled-cue')) {
+                        nameDisplayElem.classList.add('disabled-cue');
+                    }
                 });
 
             } else {

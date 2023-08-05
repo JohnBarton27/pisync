@@ -44,7 +44,7 @@
     <div class="list">
         {% for cue in existing_cues %}
         <div class="list-item">
-            <span class="item-name" data-cue-id="{{ cue.db_id }}">{{ cue.name }}</span>
+            <span class="item-name {% if not cue.is_enabled %} disabled-cue {% endif %}" data-cue-id="{{ cue.db_id }}">{{ cue.name }}</span>
             <button class="button edit-button edit-cue-btn"
                     data-cue-id="{{ cue.db_id }}"
                     data-cue-name="{{ cue.name }}"
