@@ -11,12 +11,23 @@ class Video(Media):
     media_player: ClassVar = None
 
     @classmethod
+    def set_black_screen(cls):
+        black_screen = vlc.Media('static/img/full_black.png')
+
+        cls.media_player.set_media(black_screen)
+        cls.media_player.play()
+
+        time.sleep(2)
+
+    @classmethod
     def open_vlc(cls, fullscreen: bool = True):
         #  creating vlc media player object
         cls.media_player = vlc.MediaPlayer()
 
         if fullscreen:
             cls.media_player.toggle_fullscreen()
+
+        cls.set_black_screen()
 
     def play(self):
         # media object
@@ -33,7 +44,7 @@ class Video(Media):
 
         time.sleep(self.duration)
 
-        self.__class__.media_player.stop()
+        self.__class__.set_black_screen()
 
     @property
     def duration(self):
