@@ -7,6 +7,7 @@ const editMediaModal = document.getElementById('editMediaModal');
 const closeEditMediaModalBtn = document.getElementById('editMediaModalClose');
 const editMediaForm = document.getElementById('editMediaForm');
 let CURRENT_MEDIA_ID = null;
+let CURRENT_MEDIA_BUTTON = null;
 
 // Get the buttons that open the edit media modal
 const editButtons = document.getElementsByClassName('edit-media-btn');
@@ -22,6 +23,7 @@ for (let i = 0; i < editButtons.length; i++) {
 
     // Open Edit Media Modal
     editButton.addEventListener('click', function() {
+        CURRENT_MEDIA_BUTTON = this;
         CURRENT_MEDIA_ID = this.getAttribute('data-media-id');
         const mediaFilePath = this.getAttribute('data-media-filepath');
         const mediaName = this.getAttribute('data-media-name');
@@ -115,7 +117,10 @@ editMediaForm.addEventListener('submit', function(event) {
                     const nameDisplayElem = document.querySelectorAll('[data-media-id="' + CURRENT_MEDIA_ID + '"].item-name')[0];
                     nameDisplayElem.innerHTML = data.name;
 
-                    // TODO update data attributes
+                    CURRENT_MEDIA_BUTTON.setAttribute('data-media-name', data.name);
+                    CURRENT_MEDIA_BUTTON.setAttribute('data-media-filepath', data.file_path);
+                    CURRENT_MEDIA_BUTTON.setAttribute('data-media-start', data.start_timecode);
+                    CURRENT_MEDIA_BUTTON.setAttribute('data-media-end', data.end_timecode);
                 });
 
             } else {
