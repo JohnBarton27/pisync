@@ -166,7 +166,7 @@ def create_cue(cue_creation: CreateCueRequest):
 @app.put("/cue/update")
 def update_cue(cue_update: CueUpdateRequest):
     cue = Cue.get_by_id(cue_update.db_id)
-    cue.update(cue_update.name, cue_update.source_media_id, cue_update.source_media_timecode, cue_update.target_media_id)
+    cue.update(cue_update.name, cue_update.source_media_id, cue_update.source_media_timecode, cue_update.target_media_id, cue_update.is_enabled)
 
     cue = Cue.get_by_id(cue_update.db_id)
     return cue

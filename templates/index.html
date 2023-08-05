@@ -50,7 +50,8 @@
                     data-cue-name="{{ cue.name }}"
                     data-src-media-id="{{ cue.source_media_id }}"
                     data-src-media-timecode="{{ cue.source_media_timecode_secs }}"
-                    data-target-media-id="{{ cue.target_media_id }}">
+                    data-target-media-id="{{ cue.target_media_id }}"
+                    data-is-enabled="{{ cue.is_enabled }}">
                 Edit
             </button>
         </div>
@@ -147,6 +148,14 @@
                 <option value="{{ media.db_id }}">{{ media.name }}</option>
                 {% endfor %}
             </select><br><br>
+
+            <label>Enabled?</label>
+            <label class="switch">
+                <input id="editEnabled" type="checkbox">
+                <span class="slider round"></span>
+            </label>
+
+            <br><br>
 
             <input type="submit" value="Save Cue">
         </form>

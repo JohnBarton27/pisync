@@ -88,6 +88,7 @@ let CUE_NAME_INPUT = document.getElementById('editCueName');
 let SRC_MEDIA_INPUT = document.getElementById('editSourceMedia');
 let SRC_MEDIA_TIMECODE_INPUT = document.getElementById('editSourceMediaTimecode');
 let TARGET_MEDIA_INPUT = document.getElementById('editTargetMedia');
+let ENABLED_INPUT = document.getElementById('editEnabled');
 
 // Iterate through all edit buttons
 for (let i = 0; i < editCueButtons.length; i++) {
@@ -101,12 +102,14 @@ for (let i = 0; i < editCueButtons.length; i++) {
         const srcMediaId = this.getAttribute('data-src-media-id');
         const srcMediaTimecode = this.getAttribute('data-src-media-timecode');
         const targetMediaID = this.getAttribute('data-target-media-id');
+        const isEnabled = this.getAttribute('data-is-enabled') === "True" || this.getAttribute('data-is-enabled') === true;
 
         // Populate fields
         CUE_NAME_INPUT.value = cueName;
         SRC_MEDIA_INPUT.value = srcMediaId;
         SRC_MEDIA_TIMECODE_INPUT.value = srcMediaTimecode
         TARGET_MEDIA_INPUT.value = targetMediaID;
+        ENABLED_INPUT.checked = isEnabled;
 
         // Open the modal
         editCueModal.style.display = 'block';
@@ -134,7 +137,8 @@ editCueForm.addEventListener('submit', function(event) {
         name: CUE_NAME_INPUT.value,
         source_media_id: SRC_MEDIA_INPUT.value,
         source_media_timecode: SRC_MEDIA_TIMECODE_INPUT.value,
-        target_media_id: TARGET_MEDIA_INPUT.value
+        target_media_id: TARGET_MEDIA_INPUT.value,
+        is_enabled: ENABLED_INPUT.checked
     }
 
     // Create JSON body
@@ -160,6 +164,7 @@ editCueForm.addEventListener('submit', function(event) {
                     CURRENT_CUE_BUTTON.setAttribute('data-src-media-id', data.source_media_id);
                     CURRENT_CUE_BUTTON.setAttribute('data-src-media-timecode', data.source_media_timecode_secs);
                     CURRENT_CUE_BUTTON.setAttribute('data-target-media-id', data.target_media_id);
+                    CURRENT_CUE_BUTTON.setAttribute('data-is-enabled', data.is_enabled);
 
                     // Update display name
                     const nameDisplayElem = document.querySelectorAll('[data-cue-id="' + CURRENT_CUE_ID + '"].item-name')[0];

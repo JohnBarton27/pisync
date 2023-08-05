@@ -13,6 +13,7 @@ class Cue(BaseModel):
     source_media_id: int = None
     source_media_timecode_secs: float = None
     target_media_id: int = None
+    is_enabled: bool = True
 
     @property
     def source_media(self):
@@ -47,11 +48,11 @@ class Cue(BaseModel):
         conn.commit()
         conn.close()
 
-    def update(self, new_name: str, new_source_media_id: int, new_source_media_timecode: float, new_target_media_id: int):
+    def update(self, new_name: str, new_source_media_id: int, new_source_media_timecode: float, new_target_media_id: int, is_enabled: bool):
         conn = self.__class__.get_db_conn()
         cursor = conn.cursor()
-        update_query = "UPDATE cues SET friendly_name = ?, source_media_id = ?, source_media_timecode_secs = ?, target_media_id = ? WHERE id = ?"
-        cursor.execute(update_query, (new_name, new_source_media_id, str(new_source_media_timecode), new_target_media_id, self.db_id))
+        update_query = "UPDATE cues SET friendly_name = ?, source_media_id = ?, source_media_timecode_secs = ?, target_media_id = ?, is_enabled = ? WHERE id = ?"
+        cursor.execute(update_query, (new_name, new_source_media_id, str(new_source_media_timecode), new_target_media_id, 1 if is_enabled else 0, self.db_id))
         conn.commit()
         conn.close()
 
@@ -96,8 +97,9 @@ class Cue(BaseModel):
         source_media_timecode_secs = result['source_media_timecode_secs']
         target_media_id = result['target_media_id']
         db_id = result['id']
+        is_enabled = bool(result['is_enabled'])
 
-        return Cue(name=name, db_id=db_id, source_media_id=source_media_id, source_media_timecode_secs=source_media_timecode_secs, target_media_id=target_media_id)
+        return Cue(name=name, db_id=db_id, source_media_id=source_media_id, source_media_timecode_secs=source_media_timecode_secs, target_media_id=target_media_id, is_enabled=is_enabled)
 
     @classmethod
     def get_db_conn(cls):

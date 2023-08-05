@@ -27,13 +27,13 @@ def setup_media_table(cursor, is_server: bool):
             client_id INTEGER
         """
 
-    create_table_query = f"""
+    create_media_table_query = f"""
     CREATE TABLE IF NOT EXISTS media (
         {column_defs}
     )
     """
 
-    cursor.execute(create_table_query)
+    cursor.execute(create_media_table_query)
 
     # Create the 'media' folder if it doesn't exist
     media_dir = os.path.join(os.getcwd(), 'media')
@@ -59,7 +59,7 @@ def setup_server_db():
     setup_media_table(db_cursor, is_server=True)
 
     # Define the Clients table
-    create_table_query = """
+    create_client_table_query = """
     CREATE TABLE IF NOT EXISTS clients (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         hostname TEXT UNIQUE,
@@ -68,19 +68,20 @@ def setup_server_db():
         is_online INTEGER
     )
     """
-    db_cursor.execute(create_table_query)
+    db_cursor.execute(create_client_table_query)
 
     # Define the Cues table
-    create_table_query = """
+    create_cue_table_query = """
     CREATE TABLE IF NOT EXISTS cues (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         friendly_name TEXT UNIQUE,
         source_media_id INT NOT NULL,
         source_media_timecode_secs REAL NOT NULL,
-        target_media_id INT
+        target_media_id INT,
+        is_enabled INTEGER NOT NULL DEFAULT 1
     )
     """
-    db_cursor.execute(create_table_query)
+    db_cursor.execute(create_cue_table_query)
 
 
 def setup_client_db():
