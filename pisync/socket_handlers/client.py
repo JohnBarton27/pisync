@@ -49,6 +49,7 @@ def connect_to_server(app):
                     if media.file_path == filepath_of_media_to_play:
                         media.play()
 
-    recv_thread = threading.Thread(target=receive_server_messages)
-    recv_thread.start()
-    app.active_threads.append(recv_thread)
+    receive_server_messages()
+
+    # We disconnected - try connecting to the server again
+    connect_to_server(app)
