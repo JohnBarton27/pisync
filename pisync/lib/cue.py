@@ -65,11 +65,11 @@ class Cue(BaseModel):
         return None
 
     @classmethod
-    def get_for_source_media(cls, src_media):
+    def get_for_source_media(cls, src_media, include_disabled: bool = False):
         # TODO switch to SQL SELECT
         cues_to_watch_for = []
         for cue in cls.get_all_from_db():
-            if cue.source_media_id == src_media.db_id:
+            if cue.source_media_id == src_media.db_id and (include_disabled or cue.is_enabled):
                 cues_to_watch_for.append(cue)
 
         return cues_to_watch_for
