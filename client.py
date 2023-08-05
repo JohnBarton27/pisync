@@ -1,3 +1,4 @@
+import argparse
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -56,7 +57,7 @@ async def shutdown_event():
     print("READY FOR SHUTDOWN.")
 
 
-def setup():
+def setup(no_video: bool = False):
     setup_client_db()
 
     # Mount static files
@@ -66,9 +67,14 @@ def setup():
     socket_thread.start()
 
     # Start VLC
-    Video.open_vlc(fullscreen=True)
+    if not no_video:
+        Video.open_vlc(fullscreen=True)
 
 
 if __name__ == "__main__":
-    setup()
+    parser = argparse.ArgumentParser(description="Runs the PiSync Client")
+    parser.add_argument('--no-video', action='store_true', help='If passed, does not show video. Useful for debugging/viewing logs.')
+    args = parser.parse_args()
+
+    setup(args.no_video)
     uvicorn.run(app, host="0.0.0.0", port=settings.API_PORT)
