@@ -9,6 +9,7 @@ import uvicorn
 
 from pisync.lib.api.client_connect_request import ClientConnectRequest
 from pisync.lib.api.client_search_response import Client as ApiClient, ClientSearchResponse
+from pisync.lib.api.cue_update_request import CueUpdateRequest
 from pisync.lib.api.create_cue_request import CreateCueRequest
 from pisync.lib.api.info_response import InfoResponse
 from pisync.lib.api.media_update_request import MediaUpdateRequest
@@ -159,6 +160,15 @@ def create_cue(cue_creation: CreateCueRequest):
               source_media_timecode_secs=cue_creation.sourceMediaTimecode,
               target_media_id=cue_creation.targetMediaId)
     cue.insert_to_db()
+    return cue
+
+
+@app.put("/cue/update")
+def update_cue(cue_update: CueUpdateRequest):
+    cue = Cue.get_by_id(cue_update.db_id)
+    cue.update(cue_update.name, cue_update.source_media_id, cue_update.source_media_timecode, cue_update.target_media_id)
+
+    cue = Cue.get_by_id(cue_update.db_id)
     return cue
 
 

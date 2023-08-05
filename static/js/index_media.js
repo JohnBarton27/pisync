@@ -23,7 +23,7 @@ for (let i = 0; i < editButtons.length; i++) {
     // Open Edit Media Modal
     editButton.addEventListener('click', function() {
         CURRENT_MEDIA_ID = this.getAttribute('data-media-id');
-        const mediaFilePath = this.getAttribute('data-media-filepath')
+        const mediaFilePath = this.getAttribute('data-media-filepath');
         const mediaName = this.getAttribute('data-media-name');
         let mediaStartTime = this.getAttribute('data-media-start');
         let mediaEndTime = this.getAttribute('data-media-end');
@@ -114,6 +114,8 @@ editMediaForm.addEventListener('submit', function(event) {
                 response.json().then(data => {
                     const nameDisplayElem = document.querySelectorAll('[data-media-id="' + CURRENT_MEDIA_ID + '"].item-name')[0];
                     nameDisplayElem.innerHTML = data.name;
+
+                    // TODO update data attributes
                 });
 
             } else {

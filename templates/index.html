@@ -44,8 +44,16 @@
     <div class="list">
         {% for cue in existing_cues %}
         <div class="list-item">
-            <span class="item-name">{{ cue.name }}</span>
+            <span class="item-name" data-cue-id="{{ cue.db_id }}">{{ cue.name }}</span>
             <button class="button play-button">Play</button>
+            <button class="button edit-button edit-cue-btn"
+                    data-cue-id="{{ cue.db_id }}"
+                    data-cue-name="{{ cue.name }}"
+                    data-src-media-id="{{ cue.source_media_id }}"
+                    data-src-media-timecode="{{ cue.source_media_timecode_secs }}"
+                    data-target-media-id="{{ cue.target_media_id }}">
+                Edit
+            </button>
         </div>
         {% endfor %}
         <button class="button" onclick="open_add_cue_modal()">Add Cue</button>
@@ -112,6 +120,37 @@
             <input type="submit" value="Create Media Cue">
         </form>
         <button id="addCueBtn" type="submit" class="button" style="display:none;">Connect</button>
+    </div>
+</div>
+
+<!-- Edit Cue Modal -->
+<div id="editCueModal" class="modal">
+    <div class="modal-content">
+        <span id="editCueModalClose" class="close-button">&times;</span>
+        <h2>Media Cue Editor</h2>
+        <form id="editCueForm">
+            <label for="editCueName">Name:</label>
+            <input type="text" id="editCueName" name="editCueName" required><br><br>
+
+            <label for="editSourceMedia">Source Media:</label>
+            <select id="editSourceMedia" name="editSourceMedia" required>
+                {% for media in existing_media %}
+                <option value="{{ media.db_id }}">{{ media.name }}</option>
+                {% endfor %}
+            </select><br><br>
+
+            <label for="editSourceMediaTimecode">Source Media Timecode (in seconds):</label>
+            <input type="text" id="editSourceMediaTimecode" name="editSourceMediaTimecode" required><br><br>
+
+            <label for="editTargetMedia">Target Media:</label>
+            <select id="editTargetMedia" name="editTargetMedia" required>
+                {% for media in existing_media %}
+                <option value="{{ media.db_id }}">{{ media.name }}</option>
+                {% endfor %}
+            </select><br><br>
+
+            <input type="submit" value="Save Cue">
+        </form>
     </div>
 </div>
 

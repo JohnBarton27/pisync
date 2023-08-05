@@ -47,11 +47,11 @@ class Cue(BaseModel):
         conn.commit()
         conn.close()
 
-    def update_name(self, new_name: str):
+    def update(self, new_name: str, new_source_media_id: int, new_source_media_timecode: float, new_target_media_id: int):
         conn = self.__class__.get_db_conn()
         cursor = conn.cursor()
-        update_query = "UPDATE cues SET friendly_name = ? WHERE id = ?"
-        cursor.execute(update_query, (new_name, self.db_id))
+        update_query = "UPDATE cues SET friendly_name = ?, source_media_id = ?, source_media_timecode_secs = ?, target_media_id = ? WHERE id = ?"
+        cursor.execute(update_query, (new_name, new_source_media_id, str(new_source_media_timecode), new_target_media_id, self.db_id))
         conn.commit()
         conn.close()
 
