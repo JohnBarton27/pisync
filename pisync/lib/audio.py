@@ -30,9 +30,14 @@ class Audio(Media):
         pygame.mixer.music.load(self.file_path)
 
         asyncio.run(tell_frontend_client_media_status(self, MediaStatus.PLAYING, app))
+        app.playing_media.append(self)
 
         pygame.mixer.music.play(start=start)
         while pygame.mixer.music.get_busy():
+            if self.stop_signal:
+                pygame.mixer.music.stop()
+                asyncio.run(tell_frontend_client_media_status(self, MediaStatus.STOPPED, app))
+
             current_time = (pygame.mixer.music.get_pos() + 1000 * start) / 1000
             print(f'Current time: {current_time}', end="\r")
 

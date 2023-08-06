@@ -26,7 +26,7 @@
         {% for media in existing_media %}
         <div class="list-item">
             <span{% if media.client and not media.client.is_online %} class="item-name offline-client" {% else %} class="item-name" {% endif %} data-media-id="{{ media.db_id }}" {% if media.client %} data-client-ip="{{ media.client.ip_address }}" {% endif %}>{{media.name}} {% if media.client %}({{media.client.friendly_name}}){% endif %}</span>
-            <button class="button play-button stopped" onclick="playMedia(`{{ media.db_id }}`)" data-media-id="{{ media.db_id }}">Play</button>
+            <button class="button play-button stopped" onclick="playMedia(this, `{{ media.db_id }}`)" data-media-id="{{ media.db_id }}">Play</button>
             <button class="button edit-button edit-media-btn"
                     data-media-id="{{ media.db_id }}"
                     data-media-name="{{ media.name }}"

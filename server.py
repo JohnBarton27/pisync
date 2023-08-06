@@ -35,6 +35,8 @@ app.active_threads = []
 app.connected_clients = set()
 app.client_sockets = []
 
+app.playing_media = []
+
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -141,6 +143,30 @@ def play_media(media_id: int):
 
     print(f"Playing local media ({media.name})...")
     media.play(app)
+    return
+
+
+@app.post("/stop/{media_id}")
+def stop_media(media_id: int):
+    selected_media = None
+    for media in app.playing_media:
+        if media.db_id == media_id:
+            selected_media = media
+            break
+
+    if selected_media.client_id:
+        client_obj = ClientObj.get_by_id(selected_media.client_id)
+        print(f'Looking for client {client_obj.hostname}...')
+        for cli_socket in app.client_sockets:
+            if cli_socket.getpeername()[0] == client_obj.ip_address:
+                # TODO #7 this needs to be a MediaStopRequestMessage
+                message = MediaPlayRequestMessage(selected_media.file_path)
+                message.send(cli_socket)
+        return
+
+    print(f"Stopping local media ({selected_media.name})...")
+    selected_media.stop()
+    app.playing_media.remove(selected_media)
     return
 
 

@@ -136,18 +136,34 @@ editMediaForm.addEventListener('submit', function(event) {
 //////
 // PLAY MEDIA
 //////
-function playMedia(id) {
+function playMedia(element, id) {
     let xhr = new XMLHttpRequest();
-    xhr.open('POST', '/play/' + id, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            // Handle successful response here
-            console.log('Media played successfully');
-        } else {
-            // Handle error or other response statuses here
-            console.error('Error playing media');
-        }
-    };
+    if (element.classList.contains('stopped')) {
+        // Media is stopped, but needs to be played
+        xhr.open('POST', '/play/' + id, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Handle successful response here
+                console.log('Media played successfully');
+            } else {
+                // Handle error or other response statuses here
+                console.error('Error playing media');
+            }
+        };
+    } else if (element.classList.contains('playing')) {
+        // Media is playing, and needs to be stopped
+        xhr.open('POST', '/stop/' + id, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Handle successful response here
+                console.log('Media stopped successfully');
+            } else {
+                // Handle error or other response statuses here
+                console.error('Error stopping media');
+            }
+        };
+    }
     xhr.send(JSON.stringify({}));
 }
