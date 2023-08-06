@@ -1,6 +1,5 @@
 import pickle
 import socket
-import threading
 import time
 
 from pisync.lib.media import Media

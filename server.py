@@ -140,7 +140,7 @@ def play_media(media_id: int):
         return
 
     print(f"Playing local media ({media.name})...")
-    media.play()
+    media.play(app)
     return
 
 

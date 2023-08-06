@@ -15,6 +15,13 @@ class MediaTypes(Enum):
     VIDEO = 'VIDEO'
 
 
+class MediaStatus(Enum):
+
+    STOPPED = 'STOPPED'
+    PLAYING = 'PLAYING'
+    PAUSED = 'PAUSED'
+
+
 class Media(BaseModel, ABC):
     file_path: str = None
     name: str = None
@@ -24,7 +31,7 @@ class Media(BaseModel, ABC):
     end_timecode: Optional[float] = None
 
     @abstractmethod
-    def play(self):
+    def play(self, app):
         pass
 
     @property

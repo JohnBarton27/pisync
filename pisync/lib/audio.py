@@ -1,20 +1,17 @@
+import asyncio
 import pygame
 import requests
 import threading
-from urllib.parse import urlparse
-from urllib.request import pathname2url
 
-from pisync.lib.client import Client
-from pisync.lib.media import Media
-from pisync.lib.message import MediaPlayRequestMessage
-from pisync.lib.video import Video
+from pisync.socket_handlers.server import tell_frontend_client_media_status
+from pisync.lib.media import Media, MediaStatus
 
 import settings
 
 
 class Audio(Media):
 
-    def play(self):
+    def play(self, app):
         start = self.start_timecode if self.start_timecode else 0.0
 
         from pisync.lib.cue import Cue
@@ -31,6 +28,9 @@ class Audio(Media):
         pygame.init()
         pygame.mixer.init()
         pygame.mixer.music.load(self.file_path)
+
+        asyncio.run(tell_frontend_client_media_status(self, MediaStatus.PLAYING, app))
+
         pygame.mixer.music.play(start=start)
         while pygame.mixer.music.get_busy():
             current_time = (pygame.mixer.music.get_pos() + 1000 * start) / 1000
@@ -53,6 +53,9 @@ class Audio(Media):
 
             if self.end_timecode and current_time >= self.end_timecode:
                 pygame.mixer.music.stop()
+                asyncio.run(tell_frontend_client_media_status(self, MediaStatus.STOPPED, app))
                 return
 
             continue
+
+        asyncio.run(tell_frontend_client_media_status(self, MediaStatus.STOPPED, app))

@@ -74,8 +74,15 @@ p {
 }
 
 .list-item .play-button {
-    background-color: #008800;
     color: #fff;
+}
+
+.stopped {
+    background-color: #008800;
+}
+
+.playing {
+    background-color: #880000;
 }
 
 /* Modal Styles */

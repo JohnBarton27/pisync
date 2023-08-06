@@ -29,7 +29,7 @@ class Video(Media):
 
         cls.set_black_screen()
 
-    def play(self):
+    def play(self, app):
         # media object
         media = vlc.Media(self.file_path)
 
