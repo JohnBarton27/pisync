@@ -1,6 +1,6 @@
-import asyncio
 import pickle
 import socket
+import threading
 import time
 
 from pisync.lib.media import Media
@@ -54,7 +54,8 @@ def connect_to_server(app):
                 filepath_of_media_to_play = message_obj.get_content()
                 for media in Media.get_all_from_db():
                     if media.file_path == filepath_of_media_to_play:
-                        asyncio.run(play_media(media, client_socket, app))
+                        media_thread = threading.Thread(target=play_media, args=(media, client_socket, app))
+                        media_thread.start()
             elif isinstance(message_obj, MediaStopRequestMessage):
                 print(f'Received message to stop playing media...')
                 filepath_of_media_to_stop = message_obj.get_content()
