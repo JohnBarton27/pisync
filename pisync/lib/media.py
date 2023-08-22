@@ -15,6 +15,13 @@ class MediaTypes(Enum):
     VIDEO = 'VIDEO'
 
 
+class MediaStatus(Enum):
+
+    STOPPED = 'STOPPED'
+    PLAYING = 'PLAYING'
+    PAUSED = 'PAUSED'
+
+
 class Media(BaseModel, ABC):
     file_path: str = None
     name: str = None
@@ -22,9 +29,10 @@ class Media(BaseModel, ABC):
     client_id: Optional[int] = None
     start_timecode: Optional[float] = None
     end_timecode: Optional[float] = None
+    stop_signal: bool = False
 
     @abstractmethod
-    def play(self):
+    def play(self, app):
         pass
 
     @property
@@ -33,6 +41,9 @@ class Media(BaseModel, ABC):
             return None
 
         return Client.get_by_id(self.client_id)
+
+    def stop(self):
+        self.stop_signal = True
 
     def exists_in_database(self):
         conn = self.__class__.get_db_conn()

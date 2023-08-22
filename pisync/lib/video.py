@@ -1,3 +1,4 @@
+import datetime
 from moviepy.editor import VideoFileClip
 import time
 from typing import ClassVar
@@ -29,7 +30,7 @@ class Video(Media):
 
         cls.set_black_screen()
 
-    def play(self):
+    def play(self, app):
         # media object
         media = vlc.Media(self.file_path)
 
@@ -42,9 +43,14 @@ class Video(Media):
         if self.start_timecode:
             self.__class__.media_player.set_time(int(self.start_timecode * 1000))
 
-        time.sleep(self.duration)
+        start_time = datetime.datetime.now()
+        while True:
+            current_time = datetime.datetime.now()
 
-        self.__class__.set_black_screen()
+            elapsed = current_time - start_time
+            if elapsed.total_seconds() >= self.duration or self.stop_signal:
+                self.__class__.set_black_screen()
+                break
 
     @property
     def duration(self):

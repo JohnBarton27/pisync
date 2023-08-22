@@ -4,8 +4,8 @@ import socket
 import threading
 
 from pisync.lib.client import Client as ClientObj
-from pisync.lib.media import Media
-from pisync.lib.message import Message, ClientMediaDumpMessage
+from pisync.lib.media import Media, MediaStatus
+from pisync.lib.message import Message, ClientMediaDumpMessage, MediaIsPlayingMessage
 
 import settings
 
@@ -68,7 +68,6 @@ def receive_from_client(client_socket, client_address, app):
     asyncio.run(tell_frontend_client_connection_event(client_for_socket, app))
 
     client_socket.settimeout(1)
-    client_socket.send('HELLO FROM THE SERVER'.encode())
 
     while not app.stop_flag.is_set():
         try:
@@ -91,6 +90,12 @@ def receive_from_client(client_socket, client_address, app):
                 print(f'Received dump of media info from client at {client_address}')
                 media_objs = message.get_content()
                 Media.load_media_into_db_from_client(media_objs, client_for_socket.db_id)
+            elif isinstance(message, MediaIsPlayingMessage):
+                print(f'Received MediaIsPlayingMessage from client at {client_address}')
+                media_fp = message.media.file_path
+                media = Media.get_by_file_path(media_fp)
+                status = message.status
+                asyncio.run(tell_frontend_client_media_status(media, status, app))
             else:
                 print(f'Received message from {client_address}')
 
@@ -117,3 +122,12 @@ async def tell_frontend_client_connection_event(client: ClientObj, app):
             'name': client.friendly_name
         }
         await fe_client.send_text(json.dumps(message_dict))
+
+
+async def tell_frontend_client_media_status(media: Media, status: MediaStatus, app):
+    print(f'TELLING THE FRONTEND THAT MEDIA IS {status}')
+    message = MediaIsPlayingMessage(media, status)
+    content = message.get_dict_content()
+
+    for fe_client in app.connected_clients:
+        await fe_client.send_text(json.dumps(content))

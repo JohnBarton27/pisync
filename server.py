@@ -16,7 +16,7 @@ from pisync.lib.api.media_update_request import MediaUpdateRequest
 from pisync.lib.client import Client as ClientObj
 from pisync.lib.cue import Cue
 from pisync.lib.media import Media
-from pisync.lib.message import MediaPlayRequestMessage
+from pisync.lib.message import MediaPlayRequestMessage, MediaStopRequestMessage
 
 from pisync.socket_handlers.server import connect_to_clients
 
@@ -34,6 +34,8 @@ app.active_threads = []
 
 app.connected_clients = set()
 app.client_sockets = []
+
+app.playing_media = []
 
 
 @app.websocket("/ws")
@@ -137,10 +139,35 @@ def play_media(media_id: int):
             if cli_socket.getpeername()[0] == client_obj.ip_address:
                 message = MediaPlayRequestMessage(media.file_path)
                 message.send(cli_socket)
+                app.playing_media.append(media)
         return
 
     print(f"Playing local media ({media.name})...")
-    media.play()
+    media.play(app)
+    return
+
+
+@app.post("/stop/{media_id}")
+def stop_media(media_id: int):
+    selected_media = None
+    for media in app.playing_media:
+        if media.db_id == media_id:
+            selected_media = media
+            break
+
+    if selected_media.client_id:
+        client_obj = ClientObj.get_by_id(selected_media.client_id)
+        print(f'Looking for client {client_obj.hostname}...')
+        for cli_socket in app.client_sockets:
+            if cli_socket.getpeername()[0] == client_obj.ip_address:
+                message = MediaStopRequestMessage(selected_media.file_path)
+                message.send(cli_socket)
+                app.playing_media.remove(selected_media)
+        return
+
+    print(f"Stopping local media ({selected_media.name})...")
+    selected_media.stop()
+    app.playing_media.remove(selected_media)
     return
 
 
