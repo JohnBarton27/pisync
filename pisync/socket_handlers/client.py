@@ -43,7 +43,7 @@ def connect_to_server(app):
                 filepath_of_media_to_play = message_obj.get_content()
                 for media in Media.get_all_from_db():
                     if media.file_path == filepath_of_media_to_play:
-                        media.play()
+                        media.play(app)
             elif isinstance(message_obj, MediaStopRequestMessage):
                 filepath_of_media_to_stop = message_obj.get_content()
                 for media in Media.get_all_from_db():
