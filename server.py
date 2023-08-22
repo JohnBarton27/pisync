@@ -16,7 +16,7 @@ from pisync.lib.api.media_update_request import MediaUpdateRequest
 from pisync.lib.client import Client as ClientObj
 from pisync.lib.cue import Cue
 from pisync.lib.media import Media
-from pisync.lib.message import MediaPlayRequestMessage
+from pisync.lib.message import MediaPlayRequestMessage, MediaStopRequestMessage
 
 from pisync.socket_handlers.server import connect_to_clients
 
@@ -159,8 +159,7 @@ def stop_media(media_id: int):
         print(f'Looking for client {client_obj.hostname}...')
         for cli_socket in app.client_sockets:
             if cli_socket.getpeername()[0] == client_obj.ip_address:
-                # TODO #7 this needs to be a MediaStopRequestMessage
-                message = MediaPlayRequestMessage(selected_media.file_path)
+                message = MediaStopRequestMessage(selected_media.file_path)
                 message.send(cli_socket)
         return
 

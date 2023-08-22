@@ -47,6 +47,20 @@ class MediaPlayRequestMessage(Message):
         return self.content
 
 
+class MediaStopRequestMessage(Message):
+
+    def __init__(self, content):
+        """
+        Message the server sends to a client to request the client stop playing a media file
+
+        :param content: Filepath to the Media File to be stopped
+        """
+        super().__init__(content, "MediaPlayRequestMessage")
+
+    def get_content(self):
+        return self.content
+
+
 class MediaIsPlayingMessage(Message):
 
     def __init__(self, media: Media, status: MediaStatus):

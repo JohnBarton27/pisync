@@ -3,7 +3,7 @@ import socket
 import time
 
 from pisync.lib.media import Media
-from pisync.lib.message import Message, ClientMediaDumpMessage, MediaPlayRequestMessage
+from pisync.lib.message import Message, ClientMediaDumpMessage, MediaPlayRequestMessage, MediaStopRequestMessage
 
 import settings
 
@@ -47,6 +47,11 @@ def connect_to_server(app):
                 for media in Media.get_all_from_db():
                     if media.file_path == filepath_of_media_to_play:
                         media.play()
+            elif isinstance(message_obj, MediaStopRequestMessage):
+                filepath_of_media_to_stop = message_obj.get_content()
+                for media in Media.get_all_from_db():
+                    if media.file_path == filepath_of_media_to_stop:
+                        media.stop()
 
     receive_server_messages()
 
