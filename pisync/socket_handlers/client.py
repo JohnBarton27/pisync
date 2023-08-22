@@ -10,7 +10,7 @@ from pisync.lib.message import (Message, ClientMediaDumpMessage, MediaPlayReques
 import settings
 
 
-async def play_media(media, client_socket, app):
+def play_media(media, client_socket, app):
     media_playing_message = MediaIsPlayingMessage(media, status=MediaStatus.PLAYING)
     media_playing_message.send(client_socket)
     media.play(app)
