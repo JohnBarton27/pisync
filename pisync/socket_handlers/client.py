@@ -9,6 +9,14 @@ from pisync.lib.message import (Message, ClientMediaDumpMessage, MediaPlayReques
 import settings
 
 
+async def play_media(media, client_socket):
+    media_playing_message = MediaIsPlayingMessage(media, status=MediaStatus.PLAYING)
+    media_playing_message.send(client_socket)
+    media.play(app)
+    media_stopped_message = MediaIsPlayingMessage(media, status=MediaStatus.STOPPED)
+    media_stopped_message.send(client_socket)
+
+
 def connect_to_server(app):
     # Connect to the server
     server_ip = '192.168.1.115'  # TODO remove hardcoded server IP
@@ -45,11 +53,7 @@ def connect_to_server(app):
                 filepath_of_media_to_play = message_obj.get_content()
                 for media in Media.get_all_from_db():
                     if media.file_path == filepath_of_media_to_play:
-                        media_playing_message = MediaIsPlayingMessage(media, status=MediaStatus.PLAYING)
-                        media_playing_message.send(client_socket)
-                        media.play(app)
-                        media_stopped_message = MediaIsPlayingMessage(media, status=MediaStatus.STOPPED)
-                        media_stopped_message.send(client_socket)
+                        asyncio.run(play_media(media, client_socket))
             elif isinstance(message_obj, MediaStopRequestMessage):
                 print(f'Received message to stop playing media...')
                 filepath_of_media_to_stop = message_obj.get_content()
