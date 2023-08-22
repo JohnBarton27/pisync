@@ -162,6 +162,7 @@ def stop_media(media_id: int):
             if cli_socket.getpeername()[0] == client_obj.ip_address:
                 message = MediaStopRequestMessage(selected_media.file_path)
                 message.send(cli_socket)
+                app.playing_media.remove(selected_media)
         return
 
     print(f"Stopping local media ({selected_media.name})...")
