@@ -29,9 +29,6 @@ def connect_to_server(app):
     opening_message = ClientMediaDumpMessage(media_pickle)
     opening_message.send(client_socket)
 
-    welcome_message = client_socket.recv(1024).decode()
-    print(f"Server says: {welcome_message}")
-
     def receive_server_messages():
         while not app.stop_flag.is_set():
             data = client_socket.recv(1024)
