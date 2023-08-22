@@ -90,6 +90,10 @@ def receive_from_client(client_socket, client_address, app):
                 print(f'Received dump of media info from client at {client_address}')
                 media_objs = message.get_content()
                 Media.load_media_into_db_from_client(media_objs, client_for_socket.db_id)
+            elif isinstance(message, MediaIsPlayingMessage):
+                media = message.media
+                status = message.status
+                tell_frontend_client_media_status(media, status)
             else:
                 print(f'Received message from {client_address}')
 
