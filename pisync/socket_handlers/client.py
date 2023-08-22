@@ -9,11 +9,15 @@ from pisync.lib.message import (Message, ClientMediaDumpMessage, MediaPlayReques
 
 import settings
 
+currently_playing_media = []
+
 
 def play_media(media, client_socket, app):
     media_playing_message = MediaIsPlayingMessage(media, status=MediaStatus.PLAYING)
     media_playing_message.send(client_socket)
+    currently_playing_media.append(media)
     media.play(app)
+    currently_playing_media.remove(media)
     media_stopped_message = MediaIsPlayingMessage(media, status=MediaStatus.STOPPED)
     media_stopped_message.send(client_socket)
 
@@ -59,7 +63,7 @@ def connect_to_server(app):
             elif isinstance(message_obj, MediaStopRequestMessage):
                 print(f'Received message to stop playing media...')
                 filepath_of_media_to_stop = message_obj.get_content()
-                for media in Media.get_all_from_db():
+                for media in currently_playing_media:
                     if media.file_path == filepath_of_media_to_stop:
                         media.stop()
 
