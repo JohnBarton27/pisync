@@ -139,6 +139,7 @@ def play_media(media_id: int):
             if cli_socket.getpeername()[0] == client_obj.ip_address:
                 message = MediaPlayRequestMessage(media.file_path)
                 message.send(cli_socket)
+                app.playing_media.append(media)
         return
 
     print(f"Playing local media ({media.name})...")
