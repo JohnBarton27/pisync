@@ -10,7 +10,7 @@ from pisync.lib.message import (Message, ClientMediaDumpMessage, MediaPlayReques
 import settings
 
 
-async def play_media(media, client_socket):
+async def play_media(media, client_socket, app):
     media_playing_message = MediaIsPlayingMessage(media, status=MediaStatus.PLAYING)
     media_playing_message.send(client_socket)
     media.play(app)
@@ -54,7 +54,7 @@ def connect_to_server(app):
                 filepath_of_media_to_play = message_obj.get_content()
                 for media in Media.get_all_from_db():
                     if media.file_path == filepath_of_media_to_play:
-                        asyncio.run(play_media(media, client_socket))
+                        asyncio.run(play_media(media, client_socket, app))
             elif isinstance(message_obj, MediaStopRequestMessage):
                 print(f'Received message to stop playing media...')
                 filepath_of_media_to_stop = message_obj.get_content()
