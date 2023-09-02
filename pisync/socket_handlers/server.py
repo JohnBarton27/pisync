@@ -1,5 +1,6 @@
 import asyncio
 import json
+import pickle
 import socket
 import threading
 
@@ -72,8 +73,15 @@ def receive_from_client(client_socket, client_address, app):
     while not app.stop_flag.is_set():
         try:
             # Receive data from the client
-            data = client_socket.recv(1024)
-            if not data:
+            data_pieces = []
+            while True:
+                # Get a full message
+                packet = client_socket.recv(4096)
+                if not packet:
+                    break
+                data_pieces.append(packet)
+
+            if not data_pieces:
                 # Client disconnected
                 print('Client disconnected:', client_address)
                 client_for_socket.update_online_status(False)
@@ -82,6 +90,8 @@ def receive_from_client(client_socket, client_address, app):
 
                 client_socket.close()
                 break
+
+            data = pickle.loads(b"".join(data_pieces))
 
             # Process received data
             message = Message.get_from_socket(data)

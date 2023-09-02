@@ -15,7 +15,7 @@ class Message:
 
     def send(self, msg_socket: socket):
         message = pickle.dumps(self)
-        print(f'Sending {self.__class__.__name__}...')
+        print(f'Sending {self.__class__.__name__} to {msg_socket.getpeername()[0]}...')
         msg_socket.send(message)
 
     @classmethod
