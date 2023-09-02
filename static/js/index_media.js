@@ -73,13 +73,6 @@ closeEditMediaModalBtn.addEventListener('click', function() {
     editMediaModal.style.display = 'none';
 });
 
-// Close the modal when the user clicks outside of it
-window.addEventListener('click', function(event) {
-    if (event.target === editMediaModal) {
-        editMediaModal.style.display = 'none';
-    }
-});
-
 // Handle form submission
 editMediaForm.addEventListener('submit', function(event) {
     event.preventDefault();
@@ -195,13 +188,6 @@ addMediaBtn.addEventListener('click', function() {
 // Close the modal when the close button is clicked
 closeAddMediaModalBtn.addEventListener('click', function() {
     addMediaModal.style.display = 'none';
-});
-
-// Close the modal when the user clicks outside of it
-window.addEventListener('click', function(event) {
-    if (event.target === addMediaModal) {
-        addMediaModal.style.display = 'none';
-    }
 });
 
 // Handle form submission
