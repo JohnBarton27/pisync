@@ -2,6 +2,10 @@
 Easily sync media (audio, video, etc.) across multiple Raspberry Pis (or similar SBCs) for cool holiday displays or
 special events!
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=JohnBarton27_pisync&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=JohnBarton27_pisync)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=JohnBarton27_pisync&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=JohnBarton27_pisync)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=JohnBarton27_pisync&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=JohnBarton27_pisync)
+
 ## Running
 To start the server, run:
 
