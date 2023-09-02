@@ -86,11 +86,16 @@
     <div class="modal-content">
         <span id="addMediaModalClose" class="close-button">&times;</span>
         <h2>Add Media</h2>
-        <form id="addMediaForm" enctype="multipart/form-data">
-            <input type="file" name="mediaFileInput" id="mediaFileInput">
-            <input type="submit" value="Add Media">
-        </form>
-        </form>
+        <div class="upload-container">
+            <form id="addMediaForm" enctype="multipart/form-data">
+                <label for="mediaFileInput" class="custom-file-upload">
+                    <i class="fas fa-cloud-upload-alt"></i> Choose a file
+                </label>
+                <input type="file" name="mediaFileInput" id="mediaFileInput" style="display:none;">
+                <span id="fileToBeUploadedName"></span>
+                <button type="submit" class="upload-button">Add Media</button>
+            </form>
+        </div>
     </div>
 </div>
 

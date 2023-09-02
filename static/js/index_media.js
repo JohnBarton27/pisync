@@ -176,6 +176,7 @@ const addMediaModal = document.getElementById('addMediaModal');
 const closeAddMediaModalBtn = document.getElementById('addMediaModalClose');
 const addMediaForm = document.getElementById('addMediaForm');
 const addMediaBtn = document.getElementById('addMediaBtn');
+const fileNameDisplayElem = document.getElementById('fileToBeUploadedName');
 
 const MEDIA_FILE_INPUT = document.getElementById("mediaFileInput");
 
@@ -188,6 +189,15 @@ addMediaBtn.addEventListener('click', function() {
 // Close the modal when the close button is clicked
 closeAddMediaModalBtn.addEventListener('click', function() {
     addMediaModal.style.display = 'none';
+});
+
+// Update file name display when a file is selected
+MEDIA_FILE_INPUT.addEventListener("change", () => {
+    if (MEDIA_FILE_INPUT.files.length > 0) {
+        fileNameDisplayElem.textContent = `${MEDIA_FILE_INPUT.files[0].name}`;
+    } else {
+        fileNameDisplayElem.textContent = "";
+    }
 });
 
 // Handle form submission
