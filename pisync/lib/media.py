@@ -157,6 +157,15 @@ class Media(BaseModel, ABC):
         return sqlite3.connect(database_file)
 
     @classmethod
+    def update_db_with_local_files(cls):
+        media_files = cls.get_all_local_files()
+
+        # Check if each file exists in the database, and if not, add it
+        for media in media_files:
+            if not media.exists_in_database():
+                media.insert_to_db()
+
+    @classmethod
     def get_all_local_files(cls):
         from pisync.lib.audio import Audio
         from pisync.lib.video import Video

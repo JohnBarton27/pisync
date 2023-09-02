@@ -12,13 +12,6 @@ closeAddCueModalBtn.addEventListener('click', function() {
     addCueModal.style.display = 'none';
 })
 
-// Close the modal when the user clicks outside of it
-window.addEventListener('click', function(event) {
-    if (event.target === addCueModal) {
-        addCueModal.style.display = 'none';
-    }
-});
-
 function open_add_cue_modal() {
     addCueModal.style.display = 'block';
 }
@@ -119,13 +112,6 @@ for (let i = 0; i < editCueButtons.length; i++) {
 // Close the modal when the close button is clicked
 closeEditCueModalBtn.addEventListener('click', function() {
     editCueModal.style.display = 'none';
-});
-
-// Close the modal when the user clicks outside of it
-window.addEventListener('click', function(event) {
-    if (event.target === editCueModal) {
-        editCueModal.style.display = 'none';
-    }
 });
 
 // Handle form submission

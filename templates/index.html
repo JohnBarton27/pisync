@@ -22,7 +22,7 @@
     </div>
 
     <h2>Media</h2>
-    <div class="list">
+    <div id="mediaList" class="list">
         {% for media in existing_media %}
         <div class="list-item">
             <span{% if media.client and not media.client.is_online %} class="item-name offline-client" {% else %} class="item-name" {% endif %} data-media-id="{{ media.db_id }}" {% if media.client %} data-client-ip="{{ media.client.ip_address }}" {% endif %}>{{media.name}} {% if media.client %}({{media.client.friendly_name}}){% endif %}</span>
@@ -37,8 +37,8 @@
             </button>
         </div>
         {% endfor %}
-        <button class="button">Add Media</button>
     </div>
+    <button id="addMediaBtn" class="button" style="margin-top: 10px;">Add Media</button>
 
     <h2>Cues</h2>
     <div class="list">
@@ -78,6 +78,24 @@
 
             <button type="submit" class="button">Save</button>
         </form>
+    </div>
+</div>
+
+<!-- Add Media Modal -->
+<div id="addMediaModal" class="modal">
+    <div class="modal-content">
+        <span id="addMediaModalClose" class="close-button">&times;</span>
+        <h2>Add Media</h2>
+        <div class="upload-container">
+            <form id="addMediaForm" enctype="multipart/form-data">
+                <label for="mediaFileInput" class="custom-file-upload">
+                    <i class="fas fa-cloud-upload-alt"></i> Choose a file
+                </label>
+                <input type="file" name="mediaFileInput" id="mediaFileInput" style="display:none;">
+                <span id="fileToBeUploadedName"></span>
+                <button type="submit" class="upload-button">Add Media</button>
+            </form>
+        </div>
     </div>
 </div>
 

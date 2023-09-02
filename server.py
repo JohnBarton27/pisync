@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Request, WebSocket
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Request, WebSocket, File, UploadFile
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+import os
 import requests
 import socket
 import threading
@@ -178,6 +179,21 @@ def update_media(media_update: MediaUpdateRequest):
 
     media = Media.get_by_id(media_update.db_id)
     return media
+
+
+@app.post("/media/upload")
+async def upload_file(file: UploadFile = File(...)):
+    media_dir = os.path.join(os.getcwd(), 'media')
+    upload_destination = os.path.join(media_dir, file.filename)
+
+    with open(upload_destination, "wb") as new_file:
+        content = await file.read()
+        new_file.write(content)
+
+    Media.update_db_with_local_files()
+    new_file = Media.get_by_file_path(upload_destination)
+
+    return new_file
 
 
 @app.post("/cue")

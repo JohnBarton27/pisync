@@ -2,6 +2,7 @@ fastapi
 jinja2
 moviepy
 pygame
+python-multipart
 python-vlc
 requests
 sqlalchemy

@@ -1,3 +1,5 @@
+const mediaListElem = document.getElementById('mediaList');
+
 //////
 // EDIT MEDIA MODAL
 //////
@@ -10,7 +12,7 @@ let CURRENT_MEDIA_ID = null;
 let CURRENT_MEDIA_BUTTON = null;
 
 // Get the buttons that open the edit media modal
-const editButtons = document.getElementsByClassName('edit-media-btn');
+let editButtons = document.getElementsByClassName('edit-media-btn');
 
 // Form Fields
 const EDIT_MEDIA_NAME_INPUT = document.getElementById('name');
@@ -18,60 +20,57 @@ const EDIT_MEDIA_START_TIME_INPUT = document.getElementById('startMediaTimecode'
 const EDIT_MEDIA_END_TIME_INPUT = document.getElementById('endMediaTimecode');
 
 // Iterate through all edit buttons
-for (let i = 0; i < editButtons.length; i++) {
-    const editButton = editButtons[i];
+function addListenersForEditMediaBtns() {
+    editButtons = document.getElementsByClassName('edit-media-btn');
+    for (let i = 0; i < editButtons.length; i++) {
+        const editButton = editButtons[i];
 
-    // Open Edit Media Modal
-    editButton.addEventListener('click', function() {
-        CURRENT_MEDIA_BUTTON = this;
-        CURRENT_MEDIA_ID = this.getAttribute('data-media-id');
-        const mediaFilePath = this.getAttribute('data-media-filepath');
-        const mediaName = this.getAttribute('data-media-name');
-        let mediaStartTime = this.getAttribute('data-media-start');
-        let mediaEndTime = this.getAttribute('data-media-end');
+        // Open Edit Media Modal
+        editButton.addEventListener('click', function () {
+            CURRENT_MEDIA_BUTTON = this;
+            CURRENT_MEDIA_ID = this.getAttribute('data-media-id');
+            const mediaFilePath = this.getAttribute('data-media-filepath');
+            const mediaName = this.getAttribute('data-media-name');
+            let mediaStartTime = this.getAttribute('data-media-start');
+            let mediaEndTime = this.getAttribute('data-media-end');
 
-        if (mediaStartTime === "None") {
-            mediaStartTime = null;
-        }
+            if (mediaStartTime === "None") {
+                mediaStartTime = null;
+            }
 
-        if (mediaEndTime === "None") {
-            mediaEndTime = null;
-        }
+            if (mediaEndTime === "None") {
+                mediaEndTime = null;
+            }
 
-        // Populate filepath text
-        const filepathElem = document.getElementById('editMediaFilepath');
-        filepathElem.textContent = mediaFilePath;
+            // Populate filepath text
+            const filepathElem = document.getElementById('editMediaFilepath');
+            filepathElem.textContent = mediaFilePath;
 
-        // Populate the modal form with media name and timecode values
-        EDIT_MEDIA_NAME_INPUT.value = mediaName;
+            // Populate the modal form with media name and timecode values
+            EDIT_MEDIA_NAME_INPUT.value = mediaName;
 
-        if (mediaStartTime) {
-            EDIT_MEDIA_START_TIME_INPUT.value = mediaStartTime;
-        } else {
-            EDIT_MEDIA_START_TIME_INPUT.value = null;
-        }
+            if (mediaStartTime) {
+                EDIT_MEDIA_START_TIME_INPUT.value = mediaStartTime;
+            } else {
+                EDIT_MEDIA_START_TIME_INPUT.value = null;
+            }
 
-        if (mediaEndTime) {
-            EDIT_MEDIA_END_TIME_INPUT.value = mediaEndTime;
-        } else {
-            EDIT_MEDIA_END_TIME_INPUT.value = null;
-        }
+            if (mediaEndTime) {
+                EDIT_MEDIA_END_TIME_INPUT.value = mediaEndTime;
+            } else {
+                EDIT_MEDIA_END_TIME_INPUT.value = null;
+            }
 
-        // Open the modal
-        editMediaModal.style.display = 'block';
-    });
+            // Open the modal
+            editMediaModal.style.display = 'block';
+        });
+    }
 }
+addListenersForEditMediaBtns();
 
 // Close the modal when the close button is clicked
 closeEditMediaModalBtn.addEventListener('click', function() {
     editMediaModal.style.display = 'none';
-});
-
-// Close the modal when the user clicks outside of it
-window.addEventListener('click', function(event) {
-    if (event.target === editMediaModal) {
-        editMediaModal.style.display = 'none';
-    }
 });
 
 // Handle form submission
@@ -167,3 +166,102 @@ function playMedia(element, id) {
     }
     xhr.send(JSON.stringify({}));
 }
+
+//////
+// ADD MEDIA MODAL
+//////
+
+// Add Media Modal Elements
+const addMediaModal = document.getElementById('addMediaModal');
+const closeAddMediaModalBtn = document.getElementById('addMediaModalClose');
+const addMediaForm = document.getElementById('addMediaForm');
+const addMediaBtn = document.getElementById('addMediaBtn');
+const fileNameDisplayElem = document.getElementById('fileToBeUploadedName');
+
+const MEDIA_FILE_INPUT = document.getElementById("mediaFileInput");
+
+// Open Add Media Modal
+addMediaBtn.addEventListener('click', function() {
+    // Open the modal
+    addMediaModal.style.display = 'block';
+});
+
+// Close the modal when the close button is clicked
+closeAddMediaModalBtn.addEventListener('click', function() {
+    addMediaModal.style.display = 'none';
+});
+
+// Update file name display when a file is selected
+MEDIA_FILE_INPUT.addEventListener("change", () => {
+    if (MEDIA_FILE_INPUT.files.length > 0) {
+        fileNameDisplayElem.textContent = `${MEDIA_FILE_INPUT.files[0].name}`;
+    } else {
+        fileNameDisplayElem.textContent = "";
+    }
+});
+
+// Handle form submission
+addMediaForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // Get data from the form
+    const formData = new FormData();
+    formData.append("file", MEDIA_FILE_INPUT.files[0]);
+
+    // Send POST request
+    fetch(`/media/upload`, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => {
+            if (response.ok) {
+                // Handle success
+                console.log('Media uploaded successfully');
+                addMediaModal.style.display = 'none';
+
+                response.json().then(data => {
+                    const mediaElem = document.createElement("div");
+                    mediaElem.classList.add("list-item");
+
+                    // Name (text)
+                    const nameDisplayElem = document.createElement("span");
+                    nameDisplayElem.classList.add("item-name");
+                    nameDisplayElem.textContent = data.name;
+                    mediaElem.appendChild(nameDisplayElem);
+
+                    // Play Button
+                    const playButtonElem = document.createElement('button');
+                    playButtonElem.classList.add('button', 'play-button', 'stopped');
+                    playButtonElem.onclick = function() {
+                        playMedia(playButtonElem, data.db_id);
+                    }
+                    playButtonElem.setAttribute('data-media-id', data.db_id);
+                    playButtonElem.textContent = 'Play';
+
+                    mediaElem.appendChild(playButtonElem);
+
+                    // Edit Button
+                    const editButtonElem = document.createElement('button');
+                    editButtonElem.classList.add('button', 'edit-button', 'edit-media-btn');
+                    editButtonElem.setAttribute('data-media-id', data.db_id);
+                    editButtonElem.setAttribute('data-media-name', data.name);
+                    editButtonElem.setAttribute('data-media-filepath', data.file_path);
+                    editButtonElem.setAttribute('data-media-start','');
+                    editButtonElem.setAttribute('data-media-end', '');
+                    editButtonElem.textContent = 'Edit';
+
+                    mediaElem.appendChild(editButtonElem);
+                    mediaListElem.appendChild(mediaElem);
+
+                    addListenersForEditMediaBtns();
+                });
+
+            } else {
+                // Handle error
+                console.error('Failed to update media');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+});
