@@ -42,12 +42,7 @@ def setup_media_table(cursor, is_server: bool):
 
     # Find all media files in the 'media' folder
     from pisync.lib.media import Media
-    media_files = Media.get_all_local_files()
-
-    # Check if each file exists in the database, and if not, add it
-    for media in media_files:
-        if not media.exists_in_database():
-            media.insert_to_db()
+    Media.update_db_with_local_files()
 
 
 def setup_server_db():
