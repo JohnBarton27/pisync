@@ -73,15 +73,9 @@ def receive_from_client(client_socket, client_address, app):
     while not app.stop_flag.is_set():
         try:
             # Receive data from the client
-            data_pieces = []
-            while True:
-                # Get a full message
-                packet = client_socket.recv(4096)
-                if not packet:
-                    break
-                data_pieces.append(packet)
+            data = client_socket.recv(4096)
 
-            if not data_pieces:
+            if not data:
                 # Client disconnected
                 print('Client disconnected:', client_address)
                 client_for_socket.update_online_status(False)
@@ -90,8 +84,6 @@ def receive_from_client(client_socket, client_address, app):
 
                 client_socket.close()
                 break
-
-            data = pickle.loads(b"".join(data_pieces))
 
             # Process received data
             message = Message.get_from_socket(data)
