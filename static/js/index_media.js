@@ -8,6 +8,7 @@ const mediaListElem = document.getElementById('mediaList');
 const editMediaModal = document.getElementById('editMediaModal');
 const closeEditMediaModalBtn = document.getElementById('editMediaModalClose');
 const editMediaForm = document.getElementById('editMediaForm');
+const deleteMediaButton = document.getElementById('deleteMediaBtn');
 let CURRENT_MEDIA_ID = null;
 let CURRENT_MEDIA_BUTTON = null;
 
@@ -130,6 +131,19 @@ editMediaForm.addEventListener('submit', function(event) {
         .catch(error => {
             console.error('Error:', error);
         });
+});
+
+deleteMediaButton.addEventListener('click', function() {
+    fetch(`/media/${CURRENT_MEDIA_ID}`, {
+        method: 'DELETE'
+    }).then(response => {
+        if (response.ok) {
+            const mediaListElem = document.querySelectorAll('[data-media-id="' + CURRENT_MEDIA_ID + '"].list-item')[0];
+            mediaListElem.remove()
+        } else {
+            console.error('Failed to delete media!');
+        }
+    });
 });
 
 //////

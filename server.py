@@ -17,7 +17,7 @@ from pisync.lib.api.media_update_request import MediaUpdateRequest
 from pisync.lib.client import Client as ClientObj
 from pisync.lib.cue import Cue
 from pisync.lib.media import Media
-from pisync.lib.message import MediaPlayRequestMessage, MediaStopRequestMessage
+from pisync.lib.message import MediaPlayRequestMessage, MediaStopRequestMessage, MediaDeleteRequestMessage
 
 from pisync.socket_handlers.server import connect_to_clients
 
@@ -194,6 +194,22 @@ async def upload_file(file: UploadFile = File(...)):
     new_file = Media.get_by_file_path(upload_destination)
 
     return new_file
+
+
+@app.delete("/media/{media_id}")
+def delete_media(media_id: int):
+    media = Media.get_by_id(media_id)
+    media.delete()
+
+    if media.client_id:
+        client_obj = ClientObj.get_by_id(media.client_id)
+        print(f'Looking for client {client_obj.hostname}...')
+        for cli_socket in app.client_sockets:
+            if cli_socket.getpeername()[0] == client_obj.ip_address:
+                delete_request = MediaDeleteRequestMessage(media)
+                delete_request.send(cli_socket)
+
+                return
 
 
 @app.post("/cue")

@@ -5,7 +5,7 @@ import time
 
 from pisync.lib.media import Media
 from pisync.lib.message import (Message, ClientMediaDumpMessage, MediaPlayRequestMessage, MediaStopRequestMessage,
-                                MediaIsPlayingMessage, MediaStatus)
+                                MediaIsPlayingMessage, MediaStatus, MediaDeleteRequestMessage)
 
 import settings
 
@@ -54,18 +54,22 @@ def connect_to_server(app):
 
             message_obj = Message.get_from_socket(data)
             if isinstance(message_obj, MediaPlayRequestMessage):
-                print(f'Received message to play media...')
+                print('Received message to play media...')
                 filepath_of_media_to_play = message_obj.get_content()
                 for media in Media.get_all_from_db():
                     if media.file_path == filepath_of_media_to_play:
                         media_thread = threading.Thread(target=play_media, args=(media, client_socket, app))
                         media_thread.start()
             elif isinstance(message_obj, MediaStopRequestMessage):
-                print(f'Received message to stop playing media...')
+                print('Received message to stop playing media...')
                 filepath_of_media_to_stop = message_obj.get_content()
                 for media in currently_playing_media:
                     if media.file_path == filepath_of_media_to_stop:
                         media.stop()
+            elif isinstance(message_obj, MediaDeleteRequestMessage):
+                print('Received message to delete media...')
+                media_to_delete = Media.get_by_file_path(message_obj.media.file_path)
+                media_to_delete.delete(remove_related_cues=False)
 
     receive_server_messages()
 
