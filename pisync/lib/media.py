@@ -106,9 +106,7 @@ class Media(BaseModel, ABC):
             from pisync.lib.cue import Cue
             for cue in Cue.get_all_from_db():
                 # TODO update Media's __eq__ and __hash__ to make this comparison easier
-                if cue.target_media.db_id == self.db_id:
-                    cue.delete()
-                elif cue.source_media_id == self.db_id:
+                if self.db_id in [cue.target_media.db_id, cue.source_media_id]:
                     cue.delete()
 
         # Delete actual media element
