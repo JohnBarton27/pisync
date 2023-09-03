@@ -86,3 +86,18 @@ class MediaIsPlayingMessage(Message):
                 'status': self.status.value
             }
         }
+
+
+class MediaDeleteRequestMessage(Message):
+
+    def __init__(self, media: Media):
+        """
+        Message the server sends to a client to request a media element be deleted.
+
+        :param media: Media object to be deleted
+        """
+        self.media = media
+        content = {
+            'media': self.media
+        }
+        super().__init__(content, "MediaDeleteRequestMessage")

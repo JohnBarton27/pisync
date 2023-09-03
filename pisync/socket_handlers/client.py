@@ -5,7 +5,7 @@ import time
 
 from pisync.lib.media import Media
 from pisync.lib.message import (Message, ClientMediaDumpMessage, MediaPlayRequestMessage, MediaStopRequestMessage,
-                                MediaIsPlayingMessage, MediaStatus)
+                                MediaIsPlayingMessage, MediaStatus, MediaDeleteRequestMessage)
 
 import settings
 
@@ -66,6 +66,10 @@ def connect_to_server(app):
                 for media in currently_playing_media:
                     if media.file_path == filepath_of_media_to_stop:
                         media.stop()
+            elif isinstance(message_obj, MediaDeleteRequestMessage):
+                print(f'Received message to delete media...')
+                media_to_delete = Media.get_by_file_path(message_obj.media.file_path)
+                media_to_delete.delete(remove_related_cues=False)
 
     receive_server_messages()
 

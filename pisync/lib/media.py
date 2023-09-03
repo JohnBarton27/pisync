@@ -94,6 +94,29 @@ class Media(BaseModel, ABC):
         conn.commit()
         conn.close()
 
+    def delete(self, remove_related_cues: bool = True):
+        if not self.client_id:
+            # Local media, delete from disk!
+            os.remove(self.file_path)
+        conn = self.__class__.get_db_conn()
+        cursor = conn.cursor()
+
+        if remove_related_cues:
+            # Remove any cues this piece of media was used in (should always be done when deleting from server)
+            from pisync.lib.cue import Cue
+            for cue in Cue.get_all_from_db():
+                # TODO update Media's __eq__ and __hash__ to make this comparison easier
+                if cue.target_media.db_id == self.db_id:
+                    cue.delete()
+                elif cue.source_media_id == self.db_id:
+                    cue.delete()
+
+        # Delete actual media element
+        delete_query = "DELETE from media WHERE id = ?"
+        cursor.execute(delete_query, (self.db_id,))
+        conn.commit()
+        conn.close()
+
     @classmethod
     def get_by_id(cls, db_id: int):
         for media in cls.get_all_from_db():

@@ -24,7 +24,7 @@
     <h2>Media</h2>
     <div id="mediaList" class="list">
         {% for media in existing_media %}
-        <div class="list-item">
+        <div class="list-item" data-media-id="{{ media.db_id }}">
             <span{% if media.client and not media.client.is_online %} class="item-name offline-client" {% else %} class="item-name" {% endif %} data-media-id="{{ media.db_id }}" {% if media.client %} data-client-ip="{{ media.client.ip_address }}" {% endif %}>{{media.name}} {% if media.client %}({{media.client.friendly_name}}){% endif %}</span>
             <button class="button play-button stopped" onclick="playMedia(this, `{{ media.db_id }}`)" data-media-id="{{ media.db_id }}">Play</button>
             <button class="button edit-button edit-media-btn"
@@ -77,6 +77,7 @@
             <input type="text" id="endMediaTimecode" name="endMediaTimecode"><br><br>
 
             <button type="submit" class="button">Save</button>
+            <button class="delete-button button" id="deleteMediaBtn">Delete</button>
         </form>
     </div>
 </div>

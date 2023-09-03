@@ -56,6 +56,14 @@ class Cue(BaseModel):
         conn.commit()
         conn.close()
 
+    def delete(self):
+        conn = self.__class__.get_db_conn()
+        cursor = conn.cursor()
+        delete_query = "DELETE from cues WHERE id = ?"
+        cursor.execute(delete_query, (self.db_id,))
+        conn.commit()
+        conn.close()
+
     @classmethod
     def get_by_id(cls, db_id: int):
         for cue in cls.get_all_from_db():
