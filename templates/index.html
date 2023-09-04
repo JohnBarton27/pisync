@@ -12,7 +12,7 @@
     <div id="clientDisplayList" class="list">
         {% for client in existing_clients %}
         <div class="list-item">
-            <span{% if not client.is_online %} class="offline-client"{% endif %} data-client-ip="{{ client.ip_address }}">
+            <span{% if not client.is_online %} class="offline-client"{% endif %} data-client-ip="{{ client.ip_address }}" data-client-id="{{ client.db_id }}">
                 {{ client.friendly_name }}
             </span>
             <button class="button edit-button">Edit</button>
@@ -89,6 +89,8 @@
         <h2>Add Media</h2>
         <div class="upload-container">
             <form id="addMediaForm" enctype="multipart/form-data">
+                <label for="destinationClientInput">Destination</label>
+                <select id="destinationClientInput" name="destinationClientInput"></select><br>
                 <label for="mediaFileInput" class="custom-file-upload">
                     <i class="fas fa-cloud-upload-alt"></i> Choose a file
                 </label>
@@ -96,6 +98,12 @@
                 <span id="fileToBeUploadedName"></span>
                 <button type="submit" class="upload-button">Add Media</button>
             </form>
+            <div id="spinnerElem" style="display:none; align-items: center; justify-content: center; flex-wrap: wrap">
+                <div style="margin: 15px; flex-basis: 100%;">Uploading...</div>
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -183,6 +191,7 @@
 
 <script src="{{ url_for('static', path='/js/cues.js') }}"></script>
 <script src="{{ url_for('static', path='/js/index_media.js') }}"></script>
+<script src="{{ url_for('static', path='/js/media_list.js') }}"></script>
 <script src="{{ url_for('static', path='/js/index_clients.js') }}"></script>
 <script src="{{ url_for('static', path='/js/sockets.js') }}"></script>
 

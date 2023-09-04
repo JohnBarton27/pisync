@@ -1,8 +1,7 @@
-from fastapi import FastAPI, Request, WebSocket, File, UploadFile
+from fastapi import FastAPI, Request, WebSocket, File, UploadFile, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import os
 import requests
 import socket
 import threading
@@ -182,18 +181,21 @@ def update_media(media_update: MediaUpdateRequest):
 
 
 @app.post("/media/upload")
-async def upload_file(file: UploadFile = File(...)):
-    media_dir = os.path.join(os.getcwd(), 'media')
-    upload_destination = os.path.join(media_dir, file.filename)
+async def upload_media(file: UploadFile = File(...), client_id: int = Form(None)):
+    file_obj = await file.read()
+    print(type(file_obj))
+    filename = file.filename
+    if client_id:
+        print(f'Uploading media to {client_id}...')
+        client = ClientObj.get_by_id(client_id)
 
-    with open(upload_destination, "wb") as new_file:
-        content = await file.read()
-        new_file.write(content)
-
-    Media.update_db_with_local_files()
-    new_file = Media.get_by_file_path(upload_destination)
-
-    return new_file
+        files = {'file': (filename, file_obj)}
+        receiver_url = f"http://{client.ip_address}:{settings.API_PORT}/media/upload"
+        response = requests.post(receiver_url, files=files)
+        return response.json()
+    else:
+        new_file = await Media.create(file_obj, filename)
+        return new_file
 
 
 @app.delete("/media/{media_id}")

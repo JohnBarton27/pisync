@@ -1,5 +1,6 @@
 import argparse
-from fastapi import FastAPI, Request
+
+from fastapi import FastAPI, Request, UploadFile, File
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -10,7 +11,7 @@ from pisync.lib.api.info_response import InfoResponse
 from pisync.lib.media import Media
 from pisync.lib.video import Video
 
-from pisync.socket_handlers.client import connect_to_server
+from pisync.socket_handlers.client import connect_to_server, send_server_media_dump_message
 
 from setup_db import setup_client_db
 import settings
@@ -44,6 +45,17 @@ def play_media(file_path: str):
     print(f"Playing local media ({media.name})...")
     media.play()
     return
+
+
+@app.post('/media/upload')
+async def upload_media(file: UploadFile = File(...)):
+    file_obj = await file.read()
+    filename = file.filename
+    new_file = await Media.create(file_obj, filename)
+
+    send_server_media_dump_message()
+
+    return new_file
 
 
 @app.on_event("shutdown")

@@ -196,13 +196,38 @@ function playMedia(element, id) {
 const addMediaModal = document.getElementById('addMediaModal');
 const closeAddMediaModalBtn = document.getElementById('addMediaModalClose');
 const addMediaForm = document.getElementById('addMediaForm');
+const spinnerElem = document.getElementById('spinnerElem');
 const addMediaBtn = document.getElementById('addMediaBtn');
 const fileNameDisplayElem = document.getElementById('fileToBeUploadedName');
 
-const MEDIA_FILE_INPUT = document.getElementById("mediaFileInput");
+const MEDIA_FILE_INPUT = document.getElementById('mediaFileInput');
+const MEDIA_DESTINATION_INPUT = document.getElementById('destinationClientInput');
 
 // Open Add Media Modal
 addMediaBtn.addEventListener('click', function() {
+    // Spinner
+    addMediaForm.style.display = 'flex';
+    spinnerElem.style.display = 'none';
+
+    // Only show online clients
+    let clients = getClientObjects();
+
+    MEDIA_DESTINATION_INPUT.innerHTML = '';
+
+    let serverOption = document.createElement('option');
+    serverOption.value = 'server';
+    serverOption.innerText = 'Server';
+    MEDIA_DESTINATION_INPUT.appendChild(serverOption)
+
+    clients.forEach(function(client) {
+        if (!client.isOffline) {
+            let thisClientOption = document.createElement('option');
+            thisClientOption.value = client.id;
+            thisClientOption.innerText = client.friendlyName;
+            MEDIA_DESTINATION_INPUT.appendChild(thisClientOption);
+        }
+    });
+
     // Open the modal
     addMediaModal.style.display = 'block';
 });
@@ -224,10 +249,20 @@ MEDIA_FILE_INPUT.addEventListener("change", () => {
 // Handle form submission
 addMediaForm.addEventListener('submit', function(event) {
     event.preventDefault();
+    let isForClient = false;
 
     // Get data from the form
     const formData = new FormData();
     formData.append("file", MEDIA_FILE_INPUT.files[0]);
+
+    if (MEDIA_DESTINATION_INPUT.value !== 'server') {
+        isForClient = true;
+        formData.append('client_id', MEDIA_DESTINATION_INPUT.value);
+    }
+
+    // Spinner
+    addMediaForm.style.display = 'none';
+    spinnerElem.style.display = 'flex';
 
     // Send POST request
     fetch(`/media/upload`, {
@@ -241,6 +276,11 @@ addMediaForm.addEventListener('submit', function(event) {
                 addMediaModal.style.display = 'none';
 
                 response.json().then(data => {
+                    if (isForClient) {
+                        // Allow MediaDumpMessage from client to populate media list
+                        return
+                    }
+
                     const mediaElem = document.createElement("div");
                     mediaElem.classList.add("list-item");
 

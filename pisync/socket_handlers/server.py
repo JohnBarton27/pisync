@@ -92,6 +92,8 @@ def receive_from_client(client_socket, client_address, app):
                 print(f'Received dump of media info from client at {client_address}')
                 media_objs = message.get_content()
                 Media.load_media_into_db_from_client(media_objs, client_for_socket.db_id)
+                fe_message = ClientMediaDumpMessage(pickle.dumps(Media.get_all_from_db()))
+                asyncio.run(tell_frontend_client_media_dump(fe_message, app))
             elif isinstance(message, MediaIsPlayingMessage):
                 print(f'Received MediaIsPlayingMessage from client at {client_address}')
                 media_fp = message.media.file_path
@@ -127,8 +129,14 @@ async def tell_frontend_client_connection_event(client: ClientObj, app):
 
 
 async def tell_frontend_client_media_status(media: Media, status: MediaStatus, app):
-    print(f'TELLING THE FRONTEND THAT MEDIA IS {status}')
     message = MediaIsPlayingMessage(media, status)
+    content = message.get_dict_content()
+
+    for fe_client in app.connected_clients:
+        await fe_client.send_text(json.dumps(content))
+
+
+async def tell_frontend_client_media_dump(message: ClientMediaDumpMessage, app):
     content = message.get_dict_content()
 
     for fe_client in app.connected_clients:

@@ -1,3 +1,4 @@
+from fastapi import UploadFile
 import pickle
 import socket
 
@@ -27,10 +28,29 @@ class Message:
         return pickle.loads(self.content)
 
 
-class ClientMediaDumpMessage(Message):
+class FrontendParseableMessage(Message):
+
+    def __init__(self, content, topic: str):
+        super().__init__(content, topic)
+
+    def get_dict_content(self):
+        return {
+            'topic': self.topic,
+            'content': self.content
+        }
+
+
+class ClientMediaDumpMessage(FrontendParseableMessage):
 
     def __init__(self, content):
         super().__init__(content, "ClientMediaDumpMessage")
+
+    def get_dict_content(self):
+        client_media = pickle.loads(self.content)
+        return {
+            'topic': self.topic,
+            'content': [dict(media) for media in client_media]
+        }
 
 
 class MediaPlayRequestMessage(Message):
@@ -61,7 +81,7 @@ class MediaStopRequestMessage(Message):
         return self.content
 
 
-class MediaIsPlayingMessage(Message):
+class MediaIsPlayingMessage(FrontendParseableMessage):
 
     def __init__(self, media: Media, status: MediaStatus):
         """
@@ -101,3 +121,36 @@ class MediaDeleteRequestMessage(Message):
             'media': self.media
         }
         super().__init__(content, "MediaDeleteRequestMessage")
+
+
+class MediaUploadRequestMessage(Message):
+
+    def __init__(self, file: bytes, filename: str):
+        """
+        Message the server sends to a client to upload a file to the client.
+
+        :param file: Media file to upload to the client
+        """
+        self.file = file
+        self.filename = filename
+        content = {
+            'file': self.file,
+            'name': self.filename
+        }
+        super().__init__(content, 'MediaUploadRequestMessage')
+
+    def send(self, msg_socket: socket):
+        import time
+        print(f'Sending {self.__class__.__name__} to {msg_socket.getpeername()[0]}...')
+        message = pickle.dumps(self)
+
+        chunk_size = 4096
+        total_chunks = (len(message) + chunk_size - 1) // chunk_size
+
+        for i in range(0, len(message), chunk_size):
+            time.sleep(0.1)
+            chunk = message[i:i+chunk_size]
+            msg_socket.send(chunk)
+            print(f"Sent chunk {i//chunk_size + 1}/{total_chunks}")
+
+        msg_socket.send(message)

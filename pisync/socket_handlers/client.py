@@ -10,9 +10,10 @@ from pisync.lib.message import (Message, ClientMediaDumpMessage, MediaPlayReques
 import settings
 
 currently_playing_media = []
+client_socket = None
 
 
-def play_media(media, client_socket, app):
+def play_media(media, app):
     media_playing_message = MediaIsPlayingMessage(media, status=MediaStatus.PLAYING)
     media_playing_message.send(client_socket)
     currently_playing_media.append(media)
@@ -23,6 +24,7 @@ def play_media(media, client_socket, app):
 
 
 def connect_to_server(app):
+    global client_socket
     # Connect to the server
     server_ip = '192.168.1.115'  # TODO remove hardcoded server IP
 
@@ -43,35 +45,51 @@ def connect_to_server(app):
     opening_message = ClientMediaDumpMessage(media_pickle)
     opening_message.send(client_socket)
 
-    def receive_server_messages():
+    def get_message_from_socket(server_socket):
+        data_pieces = []
         while not app.stop_flag.is_set():
-            data = client_socket.recv(1024)
+            data = server_socket.recv(4096)
             if not data:
                 # Server disconnected
                 print("Server disconnected.")
-                client_socket.close()
+                server_socket.close()
                 break
 
-            message_obj = Message.get_from_socket(data)
-            if isinstance(message_obj, MediaPlayRequestMessage):
-                print('Received message to play media...')
-                filepath_of_media_to_play = message_obj.get_content()
-                for media in Media.get_all_from_db():
-                    if media.file_path == filepath_of_media_to_play:
-                        media_thread = threading.Thread(target=play_media, args=(media, client_socket, app))
-                        media_thread.start()
-            elif isinstance(message_obj, MediaStopRequestMessage):
-                print('Received message to stop playing media...')
-                filepath_of_media_to_stop = message_obj.get_content()
-                for media in currently_playing_media:
-                    if media.file_path == filepath_of_media_to_stop:
-                        media.stop()
-            elif isinstance(message_obj, MediaDeleteRequestMessage):
-                print('Received message to delete media...')
-                media_to_delete = Media.get_by_file_path(message_obj.media.file_path)
-                media_to_delete.delete(remove_related_cues=False)
+            try:
+                if data_pieces:
+                    data = b''.join(data_pieces)
+                message_obj = Message.get_from_socket(data)
+                return message_obj
+            except (pickle.UnpicklingError, EOFError):
+                data_pieces.append(data)
+
+    def receive_server_messages():
+        message_obj = get_message_from_socket(client_socket)
+        if isinstance(message_obj, MediaPlayRequestMessage):
+            print('Received message to play media...')
+            filepath_of_media_to_play = message_obj.get_content()
+            for media in Media.get_all_from_db():
+                if media.file_path == filepath_of_media_to_play:
+                    media_thread = threading.Thread(target=play_media, args=(media, client_socket, app))
+                    media_thread.start()
+        elif isinstance(message_obj, MediaStopRequestMessage):
+            print('Received message to stop playing media...')
+            filepath_of_media_to_stop = message_obj.get_content()
+            for media in currently_playing_media:
+                if media.file_path == filepath_of_media_to_stop:
+                    media.stop()
+        elif isinstance(message_obj, MediaDeleteRequestMessage):
+            print('Received message to delete media...')
+            media_to_delete = Media.get_by_file_path(message_obj.media.file_path)
+            media_to_delete.delete(remove_related_cues=False)
 
     receive_server_messages()
 
     # We disconnected - try connecting to the server again
     connect_to_server(app)
+
+
+def send_server_media_dump_message():
+    local_media = Media.get_all_from_db()
+    client_media_msg = ClientMediaDumpMessage(pickle.dumps(local_media))
+    client_media_msg.send(client_socket)

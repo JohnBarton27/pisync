@@ -22,12 +22,18 @@ function handleMediaIsPlaying(mediaId, mediaStatus) {
     }
 }
 
+function handleClientMediaDumpMessage(mediaList) {
+    buildMediaList(mediaList);
+}
+
 socket.onmessage = function (event) {
     const message = JSON.parse(event.data);
     console.log("New message: " + message);
 
     if (message.topic === "MediaIsPlayingMessage") {
         handleMediaIsPlaying(message.content.media_id, message.content.status)
+    } else if (message.topic === "ClientMediaDumpMessage") {
+        handleClientMediaDumpMessage(message.content);
     }
 
     const elementsWithDesiredIp = document.querySelectorAll(`[data-client-ip="${message.ipAddress}"]`);
