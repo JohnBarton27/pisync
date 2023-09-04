@@ -116,6 +116,13 @@ editMediaForm.addEventListener('submit', function(event) {
                 response.json().then(data => {
                     const nameDisplayElem = document.querySelectorAll('[data-media-id="' + CURRENT_MEDIA_ID + '"].item-name')[0];
                     nameDisplayElem.innerHTML = data.name;
+                    if (data.start_timecode === null) {
+                        data.start_timecode = '';
+                    }
+
+                    if (data.end_timecode === null) {
+                        data.end_timecode = '';
+                    }
 
                     CURRENT_MEDIA_BUTTON.setAttribute('data-media-name', data.name);
                     CURRENT_MEDIA_BUTTON.setAttribute('data-media-filepath', data.file_path);
