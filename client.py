@@ -1,5 +1,5 @@
 import argparse
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, UploadFile, File
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -44,6 +44,14 @@ def play_media(file_path: str):
     print(f"Playing local media ({media.name})...")
     media.play()
     return
+
+
+@app.post('/media/upload')
+async def upload_media(file: UploadFile = File(...)):
+    file_obj = await file.read()
+    filename = file.filename
+    new_file = await Media.create(file_obj, filename)
+    return new_file
 
 
 @app.on_event("shutdown")

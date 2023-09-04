@@ -129,7 +129,7 @@ class MediaUploadRequestMessage(Message):
         total_chunks = (len(message) + chunk_size - 1) // chunk_size
 
         for i in range(0, len(message), chunk_size):
-            time.sleep(1)
+            time.sleep(0.1)
             chunk = message[i:i+chunk_size]
             msg_socket.send(chunk)
             print(f"Sent chunk {i//chunk_size + 1}/{total_chunks}")
