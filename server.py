@@ -184,17 +184,19 @@ def update_media(media_update: MediaUpdateRequest):
 
 @app.post("/media/upload")
 async def upload_media(file: UploadFile = File(...), client_id: int = Form(None)):
+    file_obj = await file.read()
+    filename = file.filename
     if client_id:
         print(f'Uploading media to {client_id}...')
         client = ClientObj.get_by_id(client_id)
         for cli_socket in app.client_sockets:
             if cli_socket.getpeername()[0] == client.ip_address:
-                upload_request = MediaUploadRequestMessage(file)
+                upload_request = MediaUploadRequestMessage(file_obj, filename)
                 upload_request.send(cli_socket)
                 print('Message sent!')
                 return ''
     else:
-        new_file = await Media.create(file)
+        new_file = await Media.create(file_obj, filename)
         return new_file
 
 

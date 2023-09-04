@@ -88,13 +88,12 @@ class Media(BaseModel, ABC):
             # TODO handle name updates/etc.
 
     @classmethod
-    async def create(cls, file: UploadFile):
+    async def create(cls, file: bytes, name: str):
         media_dir = os.path.join(os.getcwd(), 'media')
-        upload_destination = os.path.join(media_dir, file.filename)
+        upload_destination = os.path.join(media_dir, name)
 
         with open(upload_destination, "wb") as new_file:
-            content = await file.read()
-            new_file.write(content)
+            new_file.write(file)
 
         Media.update_db_with_local_files()
         return cls.get_by_file_path(upload_destination)

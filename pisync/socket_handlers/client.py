@@ -83,7 +83,7 @@ def connect_to_server(app):
             media_to_delete.delete(remove_related_cues=False)
         elif isinstance(message_obj, MediaUploadRequestMessage):
             print('Received message to upload media...')
-            Media.create(message_obj.file)
+            Media.create(message_obj.file, message_obj.filename)
             local_media = Media.get_all_from_db()
             client_media_msg = ClientMediaDumpMessage(pickle.dumps(local_media))
             client_media_msg.send(client_socket)

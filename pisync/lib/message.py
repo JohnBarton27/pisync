@@ -106,19 +106,22 @@ class MediaDeleteRequestMessage(Message):
 
 class MediaUploadRequestMessage(Message):
 
-    def __init__(self, file: UploadFile):
+    def __init__(self, file: bytes, filename: str):
         """
         Message the server sends to a client to upload a file to the client.
 
         :param file: Media file to upload to the client
         """
         self.file = file
+        self.filename = filename
         content = {
-            'file': self.file
+            'file': self.file,
+            'name': self.filename
         }
         super().__init__(content, 'MediaUploadRequestMessage')
 
     def send(self, msg_socket: socket):
+        import time
         print(f'Sending {self.__class__.__name__} to {msg_socket.getpeername()[0]}...')
         message = pickle.dumps(self)
 
@@ -126,6 +129,7 @@ class MediaUploadRequestMessage(Message):
         total_chunks = (len(message) + chunk_size - 1) // chunk_size
 
         for i in range(0, len(message), chunk_size):
+            time.sleep(1)
             chunk = message[i:i+chunk_size]
             msg_socket.send(chunk)
             print(f"Sent chunk {i//chunk_size + 1}/{total_chunks}")
