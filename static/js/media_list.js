@@ -14,8 +14,6 @@ function getClientObjects() {
         clients.push(client_dict);
 
     });
-
-    console.log(clients);
     return clients;
 }
 
@@ -34,10 +32,7 @@ function buildMediaList(mediaList) {
     mediaListElem.innerHTML = '';
 
     mediaList.forEach(function(media) {
-        console.log(media.name);
-        console.log(media.client_id);
         const thisClient = getClientById(clientObjects, media.client_id)
-        console.log(thisClient);
         const listElem = document.createElement('div');
         listElem.classList.add('list-item');
         listElem.setAttribute('data-media-id', media.db_id);
