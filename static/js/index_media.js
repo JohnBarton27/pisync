@@ -199,7 +199,8 @@ const addMediaForm = document.getElementById('addMediaForm');
 const addMediaBtn = document.getElementById('addMediaBtn');
 const fileNameDisplayElem = document.getElementById('fileToBeUploadedName');
 
-const MEDIA_FILE_INPUT = document.getElementById("mediaFileInput");
+const MEDIA_FILE_INPUT = document.getElementById('mediaFileInput');
+const MEDIA_DESTINATION_INPUT = document.getElementById('destinationClientInput');
 
 // Open Add Media Modal
 addMediaBtn.addEventListener('click', function() {
@@ -228,6 +229,10 @@ addMediaForm.addEventListener('submit', function(event) {
     // Get data from the form
     const formData = new FormData();
     formData.append("file", MEDIA_FILE_INPUT.files[0]);
+
+    if (MEDIA_DESTINATION_INPUT.value !== 'server') {
+        formData.append('client_id', MEDIA_DESTINATION_INPUT.value);
+    }
 
     // Send POST request
     fetch(`/media/upload`, {

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, WebSocket, File, UploadFile
+from fastapi import FastAPI, Request, WebSocket, File, UploadFile, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -182,7 +182,8 @@ def update_media(media_update: MediaUpdateRequest):
 
 
 @app.post("/media/upload")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_media(file: UploadFile = File(...), client_id: int = Form(None)):
+    print(f'Uploading media to {client_id}...')
     media_dir = os.path.join(os.getcwd(), 'media')
     upload_destination = os.path.join(media_dir, file.filename)
 

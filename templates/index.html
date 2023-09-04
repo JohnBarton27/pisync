@@ -89,6 +89,13 @@
         <h2>Add Media</h2>
         <div class="upload-container">
             <form id="addMediaForm" enctype="multipart/form-data">
+                <label for="destinationClientInput">Destination</label>
+                <select id="destinationClientInput" name="destinationClientInput">
+                    <option value="server">Server</option>
+                    {% for client in existing_clients %}
+                    <option value="{{ client.db_id }}">{{ client.friendly_name }}</option>
+                    {% endfor %}
+                </select><br>
                 <label for="mediaFileInput" class="custom-file-upload">
                     <i class="fas fa-cloud-upload-alt"></i> Choose a file
                 </label>
