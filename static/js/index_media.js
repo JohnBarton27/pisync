@@ -209,6 +209,25 @@ addMediaBtn.addEventListener('click', function() {
     addMediaForm.style.display = 'flex';
     spinnerElem.style.display = 'none';
 
+    // Only show online clients
+    let clients = getClientObjects();
+
+    MEDIA_DESTINATION_INPUT.innerHTML = '';
+
+    let serverOption = document.createElement('option');
+    serverOption.value = 'server';
+    serverOption.innerText = 'Server';
+    MEDIA_DESTINATION_INPUT.appendChild(serverOption)
+
+    clients.forEach(function(client) {
+        if (!client.isOffline) {
+            let thisClientOption = document.createElement('option');
+            thisClientOption.value = client.id;
+            thisClientOption.innerText = client.friendlyName;
+            MEDIA_DESTINATION_INPUT.appendChild(thisClientOption);
+        }
+    });
+
     // Open the modal
     addMediaModal.style.display = 'block';
 });
