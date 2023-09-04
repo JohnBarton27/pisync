@@ -191,6 +191,7 @@ async def upload_media(file: UploadFile = File(...), client_id: int = Form(None)
             if cli_socket.getpeername()[0] == client.ip_address:
                 upload_request = MediaUploadRequestMessage(file)
                 upload_request.send(cli_socket)
+                print('Message sent!')
                 return ''
     else:
         new_file = await Media.create(file)

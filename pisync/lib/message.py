@@ -117,3 +117,30 @@ class MediaUploadRequestMessage(Message):
             'file': self.file
         }
         super().__init__(content, 'MediaUploadRequestMessage')
+
+    def send(self, msg_socket: socket):
+        print(f'Sending {self.__class__.__name__} to {msg_socket.getpeername()[0]}...')
+        message = pickle.dumps(self)
+
+        chunk_size = 4096
+        total_chunks = (len(message) + chunk_size - 1) // chunk_size
+
+        for i in range(0, len(message), chunk_size):
+            chunk = message[i:i+chunk_size]
+            msg_socket.send(chunk)
+            print(f"Sent chunk {i//chunk_size + 1}/{total_chunks}")
+
+        msg_socket.send(message)
+
+        # Let the client know we are done sending!
+        complete_message = MediaUploadCompleteMessage()
+        complete_message.send(msg_socket)
+
+
+class MediaUploadCompleteMessage(Message):
+
+    def __init__(self):
+        """
+        Server lets the client know that the file transfer is complete & has no more pieces to send!
+        """
+        super().__init__({}, 'MediaUploadCompleteMessage')

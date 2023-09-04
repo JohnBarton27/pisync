@@ -47,11 +47,11 @@ def connect_to_server(app):
     def get_message_from_socket(server_socket):
         data_pieces = []
         while not app.stop_flag.is_set():
-            data = client_socket.recv(1024)
+            data = server_socket.recv(4096)
             if not data:
                 # Server disconnected
                 print("Server disconnected.")
-                client_socket.close()
+                server_socket.close()
                 break
 
             try:
