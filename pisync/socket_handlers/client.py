@@ -70,7 +70,7 @@ def connect_to_server(app):
             filepath_of_media_to_play = message_obj.get_content()
             for media in Media.get_all_from_db():
                 if media.file_path == filepath_of_media_to_play:
-                    media_thread = threading.Thread(target=play_media, args=(media, client_socket, app))
+                    media_thread = threading.Thread(target=play_media, args=(media, app))
                     media_thread.start()
         elif isinstance(message_obj, MediaStopRequestMessage):
             print('Received message to stop playing media...')
