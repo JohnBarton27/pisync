@@ -185,15 +185,16 @@ def update_media(media_update: MediaUpdateRequest):
 @app.post("/media/upload")
 async def upload_media(file: UploadFile = File(...), client_id: int = Form(None)):
     file_obj = await file.read()
+    print(type(file_obj))
     filename = file.filename
     if client_id:
         print(f'Uploading media to {client_id}...')
         client = ClientObj.get_by_id(client_id)
 
-        files = {'file': (file.filename, await file.read())}
+        files = {'file': (filename, file_obj)}
         receiver_url = f"http://{client.ip_address}:{settings.API_PORT}/media/upload"
         response = requests.post(receiver_url, files=files)
-        return response
+        return response.json()
     else:
         new_file = await Media.create(file_obj, filename)
         return new_file

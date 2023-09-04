@@ -11,9 +11,10 @@ from pisync.lib.message import (Message, ClientMediaDumpMessage, MediaPlayReques
 import settings
 
 currently_playing_media = []
+client_socket = None
 
 
-def play_media(media, client_socket, app):
+def play_media(media, app):
     media_playing_message = MediaIsPlayingMessage(media, status=MediaStatus.PLAYING)
     media_playing_message.send(client_socket)
     currently_playing_media.append(media)
@@ -24,6 +25,7 @@ def play_media(media, client_socket, app):
 
 
 def connect_to_server(app):
+    global client_socket
     # Connect to the server
     server_ip = '192.168.1.115'  # TODO remove hardcoded server IP
 
@@ -92,3 +94,9 @@ def connect_to_server(app):
 
     # We disconnected - try connecting to the server again
     connect_to_server(app)
+
+
+def send_server_media_dump_message():
+    local_media = Media.get_all_from_db()
+    client_media_msg = ClientMediaDumpMessage(pickle.dumps(local_media))
+    client_media_msg.send(client_socket)

@@ -225,12 +225,14 @@ MEDIA_FILE_INPUT.addEventListener("change", () => {
 // Handle form submission
 addMediaForm.addEventListener('submit', function(event) {
     event.preventDefault();
+    let isForClient = false;
 
     // Get data from the form
     const formData = new FormData();
     formData.append("file", MEDIA_FILE_INPUT.files[0]);
 
     if (MEDIA_DESTINATION_INPUT.value !== 'server') {
+        isForClient = true;
         formData.append('client_id', MEDIA_DESTINATION_INPUT.value);
     }
 
@@ -246,6 +248,11 @@ addMediaForm.addEventListener('submit', function(event) {
                 addMediaModal.style.display = 'none';
 
                 response.json().then(data => {
+                    if (isForClient) {
+                        // Allow MediaDumpMessage from client to populate media list
+                        return
+                    }
+
                     const mediaElem = document.createElement("div");
                     mediaElem.classList.add("list-item");
 
