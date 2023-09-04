@@ -17,7 +17,8 @@ from pisync.lib.api.media_update_request import MediaUpdateRequest
 from pisync.lib.client import Client as ClientObj
 from pisync.lib.cue import Cue
 from pisync.lib.media import Media
-from pisync.lib.message import MediaPlayRequestMessage, MediaStopRequestMessage, MediaDeleteRequestMessage
+from pisync.lib.message import (MediaPlayRequestMessage, MediaStopRequestMessage, MediaDeleteRequestMessage,
+                                MediaUploadRequestMessage)
 
 from pisync.socket_handlers.server import connect_to_clients
 
@@ -183,18 +184,17 @@ def update_media(media_update: MediaUpdateRequest):
 
 @app.post("/media/upload")
 async def upload_media(file: UploadFile = File(...), client_id: int = Form(None)):
-    print(f'Uploading media to {client_id}...')
-    media_dir = os.path.join(os.getcwd(), 'media')
-    upload_destination = os.path.join(media_dir, file.filename)
-
-    with open(upload_destination, "wb") as new_file:
-        content = await file.read()
-        new_file.write(content)
-
-    Media.update_db_with_local_files()
-    new_file = Media.get_by_file_path(upload_destination)
-
-    return new_file
+    if client_id:
+        print(f'Uploading media to {client_id}...')
+        client = ClientObj.get_by_id(client_id)
+        for cli_socket in app.client_sockets:
+            if cli_socket.getpeername()[0] == client.ip_address:
+                upload_request = MediaUploadRequestMessage(file)
+                upload_request.send(cli_socket)
+                return ''
+    else:
+        new_file = await Media.create(file)
+        return new_file
 
 
 @app.delete("/media/{media_id}")

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import Enum
+from fastapi import UploadFile
 import os
 from pydantic import BaseModel
 import sqlite3
@@ -85,6 +86,18 @@ class Media(BaseModel, ABC):
                 media.insert_to_db()
 
             # TODO handle name updates/etc.
+
+    @classmethod
+    async def create(cls, file: UploadFile):
+        media_dir = os.path.join(os.getcwd(), 'media')
+        upload_destination = os.path.join(media_dir, file.filename)
+
+        with open(upload_destination, "wb") as new_file:
+            content = await file.read()
+            new_file.write(content)
+
+        Media.update_db_with_local_files()
+        return cls.get_by_file_path(upload_destination)
 
     def update(self, new_name: str, new_start_time: float, new_end_time: float):
         conn = self.__class__.get_db_conn()

@@ -1,3 +1,4 @@
+from fastapi import UploadFile
 import pickle
 import socket
 
@@ -101,3 +102,18 @@ class MediaDeleteRequestMessage(Message):
             'media': self.media
         }
         super().__init__(content, "MediaDeleteRequestMessage")
+
+
+class MediaUploadRequestMessage(Message):
+
+    def __init__(self, file: UploadFile):
+        """
+        Message the server sends to a client to upload a file to the client.
+
+        :param file: Media file to upload to the client
+        """
+        self.file = file
+        content = {
+            'file': self.file
+        }
+        super().__init__(content, 'MediaUploadRequestMessage')
