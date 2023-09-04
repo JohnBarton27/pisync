@@ -245,7 +245,6 @@ addMediaForm.addEventListener('submit', function(event) {
     addMediaForm.style.display = 'none';
     spinnerElem.style.display = 'flex';
 
-
     // Send POST request
     fetch(`/media/upload`, {
         method: 'POST',
