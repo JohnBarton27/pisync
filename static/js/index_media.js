@@ -196,6 +196,7 @@ function playMedia(element, id) {
 const addMediaModal = document.getElementById('addMediaModal');
 const closeAddMediaModalBtn = document.getElementById('addMediaModalClose');
 const addMediaForm = document.getElementById('addMediaForm');
+const spinnerElem = document.getElementById('spinnerElem');
 const addMediaBtn = document.getElementById('addMediaBtn');
 const fileNameDisplayElem = document.getElementById('fileToBeUploadedName');
 
@@ -204,6 +205,10 @@ const MEDIA_DESTINATION_INPUT = document.getElementById('destinationClientInput'
 
 // Open Add Media Modal
 addMediaBtn.addEventListener('click', function() {
+    // Spinner
+    addMediaForm.style.display = 'flex';
+    spinnerElem.style.display = 'none';
+
     // Open the modal
     addMediaModal.style.display = 'block';
 });
@@ -235,6 +240,11 @@ addMediaForm.addEventListener('submit', function(event) {
         isForClient = true;
         formData.append('client_id', MEDIA_DESTINATION_INPUT.value);
     }
+
+    // Spinner
+    addMediaForm.style.display = 'none';
+    spinnerElem.style.display = 'flex';
+
 
     // Send POST request
     fetch(`/media/upload`, {
