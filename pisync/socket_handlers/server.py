@@ -127,8 +127,14 @@ async def tell_frontend_client_connection_event(client: ClientObj, app):
 
 
 async def tell_frontend_client_media_status(media: Media, status: MediaStatus, app):
-    print(f'TELLING THE FRONTEND THAT MEDIA IS {status}')
     message = MediaIsPlayingMessage(media, status)
+    content = message.get_dict_content()
+
+    for fe_client in app.connected_clients:
+        await fe_client.send_text(json.dumps(content))
+
+
+async def tell_frontend_client_media_dump(message: ClientMediaDumpMessage, app):
     content = message.get_dict_content()
 
     for fe_client in app.connected_clients:

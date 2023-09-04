@@ -28,10 +28,29 @@ class Message:
         return pickle.loads(self.content)
 
 
-class ClientMediaDumpMessage(Message):
+class FrontendParseableMessage(Message):
+
+    def __init__(self, content, topic: str):
+        super().__init__(content, topic)
+
+    def get_dict_content(self):
+        return {
+            'topic': self.topic,
+            'content': self.content
+        }
+
+
+class ClientMediaDumpMessage(FrontendParseableMessage):
 
     def __init__(self, content):
         super().__init__(content, "ClientMediaDumpMessage")
+
+    def get_dict_content(self):
+        client_media = pickle.loads(self.content)
+        return {
+            'topic': self.topic,
+            'content': [dict(media) for media in client_media]
+        }
 
 
 class MediaPlayRequestMessage(Message):
@@ -62,7 +81,7 @@ class MediaStopRequestMessage(Message):
         return self.content
 
 
-class MediaIsPlayingMessage(Message):
+class MediaIsPlayingMessage(FrontendParseableMessage):
 
     def __init__(self, media: Media, status: MediaStatus):
         """
