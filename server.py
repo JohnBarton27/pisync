@@ -17,8 +17,7 @@ from pisync.lib.api.media_update_request import MediaUpdateRequest
 from pisync.lib.client import Client as ClientObj
 from pisync.lib.cue import Cue
 from pisync.lib.media import Media
-from pisync.lib.message import (MediaPlayRequestMessage, MediaStopRequestMessage, MediaDeleteRequestMessage,
-                                MediaUploadRequestMessage)
+from pisync.lib.message import MediaPlayRequestMessage, MediaStopRequestMessage, MediaDeleteRequestMessage
 
 from pisync.socket_handlers.server import connect_to_clients
 

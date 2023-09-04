@@ -5,8 +5,7 @@ import time
 
 from pisync.lib.media import Media
 from pisync.lib.message import (Message, ClientMediaDumpMessage, MediaPlayRequestMessage, MediaStopRequestMessage,
-                                MediaIsPlayingMessage, MediaStatus, MediaDeleteRequestMessage,
-                                MediaUploadRequestMessage)
+                                MediaIsPlayingMessage, MediaStatus, MediaDeleteRequestMessage)
 
 import settings
 
@@ -83,12 +82,6 @@ def connect_to_server(app):
             print('Received message to delete media...')
             media_to_delete = Media.get_by_file_path(message_obj.media.file_path)
             media_to_delete.delete(remove_related_cues=False)
-        elif isinstance(message_obj, MediaUploadRequestMessage):
-            print('Received message to upload media...')
-            Media.create(message_obj.file, message_obj.filename)
-            local_media = Media.get_all_from_db()
-            client_media_msg = ClientMediaDumpMessage(pickle.dumps(local_media))
-            client_media_msg.send(client_socket)
 
     receive_server_messages()
 

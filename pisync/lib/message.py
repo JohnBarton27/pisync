@@ -135,16 +135,3 @@ class MediaUploadRequestMessage(Message):
             print(f"Sent chunk {i//chunk_size + 1}/{total_chunks}")
 
         msg_socket.send(message)
-
-        # Let the client know we are done sending!
-        complete_message = MediaUploadCompleteMessage()
-        complete_message.send(msg_socket)
-
-
-class MediaUploadCompleteMessage(Message):
-
-    def __init__(self):
-        """
-        Server lets the client know that the file transfer is complete & has no more pieces to send!
-        """
-        super().__init__({}, 'MediaUploadCompleteMessage')
