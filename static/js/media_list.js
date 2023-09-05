@@ -1,3 +1,18 @@
+function getCurrentPlayButtonsObjects() {
+    let playBtns = {};
+    let playButtonElems = document.querySelectorAll('#mediaList .list-item .play-button');
+
+    playButtonElems.forEach(function(playElem) {
+        let currentClass = 'playing';
+        if (playElem.classList.contains('stopped')) {
+            currentClass = 'stopped';
+        }
+        playBtns[parseInt(playElem.getAttribute('data-media-id'))] = currentClass;
+    });
+
+    return playBtns;
+}
+
 function getClientObjects() {
     let clientElems = document.querySelectorAll('#clientDisplayList .list-item span');
 
@@ -27,12 +42,14 @@ function getClientById(clientList, clientId) {
 
 function buildMediaList(mediaList) {
     let clientObjects = getClientObjects();
+    let playButtonStatuses = getCurrentPlayButtonsObjects();
 
     // Clear out mediaListElem
     mediaListElem.innerHTML = '';
 
     mediaList.forEach(function(media) {
-        const thisClient = getClientById(clientObjects, media.client_id)
+        let playingClass = playButtonStatuses[media.db_id];
+        const thisClient = getClientById(clientObjects, media.client_id);
         const listElem = document.createElement('div');
         listElem.classList.add('list-item');
         listElem.setAttribute('data-media-id', media.db_id);
@@ -61,12 +78,16 @@ function buildMediaList(mediaList) {
 
         // Play Button
         let playBtn = document.createElement('button');
-        playBtn.classList.add('button', 'play-button', 'stopped');
+        playBtn.classList.add('button', 'play-button', playingClass);
         playBtn.onclick = function() {
             playMedia(playBtn, media.db_id);
         }
         playBtn.setAttribute('data-media-id', media.db_id);
-        playBtn.innerText = 'Play';
+        if (playingClass === 'playing') {
+            playBtn.innerText = 'Stop';
+        } else {
+            playBtn.innerText = 'Play';
+        }
         listElem.appendChild(playBtn);
 
         // Edit Button
