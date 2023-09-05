@@ -45,6 +45,8 @@ class Cue(BaseModel):
 
         insert_query = "INSERT INTO cues (friendly_name, source_media_id, source_media_timecode_secs, target_media_id) VALUES (?, ?, ?, ?)"
         cursor.execute(insert_query, (self.name, self.source_media_id, self.source_media_timecode_secs, self.target_media_id))
+        self.db_id = cursor.lastrowid
+
         conn.commit()
         conn.close()
 

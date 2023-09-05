@@ -1,11 +1,40 @@
+function addListenersForEditCueBtns() {
+    // Iterate through all edit buttons
+    for (let i = 0; i < editCueButtons.length; i++) {
+        const editButton = editCueButtons[i];
+
+        // Open Edit Cue Modal
+        editButton.addEventListener('click', function() {
+            let dataIsEnabled = this.getAttribute('data-is-enabled');
+            CURRENT_CUE_BUTTON = this;
+            CURRENT_CUE_ID = this.getAttribute('data-cue-id');
+            const cueName = this.getAttribute('data-cue-name');
+            const srcMediaId = this.getAttribute('data-src-media-id');
+            const srcMediaTimecode = this.getAttribute('data-src-media-timecode');
+            const targetMediaID = this.getAttribute('data-target-media-id');
+            const isEnabled = dataIsEnabled === "True" || dataIsEnabled === true || dataIsEnabled === 'true';
+
+            // Populate fields
+            CUE_NAME_INPUT.value = cueName;
+            SRC_MEDIA_INPUT.value = srcMediaId;
+            SRC_MEDIA_TIMECODE_INPUT.value = srcMediaTimecode
+            TARGET_MEDIA_INPUT.value = targetMediaID;
+            ENABLED_INPUT.checked = isEnabled;
+
+            // Open the modal
+            editCueModal.style.display = 'block';
+        });
+    }
+}
+
 //////
 // ADD CUE MODAL
 //////
 
-// Search for Clients Modal
 const addCueModal = document.getElementById('addCueModal');
 const closeAddCueModalBtn = document.getElementById('addCueModalClose');
 const addCueBtn = document.getElementById('addCueBtn');
+const cuesListElem = document.getElementById('cuesList');
 
 // Close the modal when the close button is clicked
 closeAddCueModalBtn.addEventListener('click', function() {
@@ -50,8 +79,29 @@ document.getElementById("mediaCueForm").addEventListener("submit", function (eve
                 addCueModal.style.display = 'none';
 
                 response.json().then(data => {
-                    // TODO show new cue on HTML page
-                    console.log(data)
+                    const cueElem = document.createElement('div');
+                    cueElem.classList.add('list-item');
+                    cuesListElem.appendChild(cueElem);
+
+                    // Name Span
+                    const cueNameSpan = document.createElement('span');
+                    cueNameSpan.classList.add('item-name');
+                    cueNameSpan.setAttribute('data-cue-id', data.db_id);
+                    cueNameSpan.innerText = data.name;
+                    cueElem.appendChild(cueNameSpan);
+
+                    // Edit Button
+                    const cueEditButton = document.createElement('button');
+                    cueEditButton.classList.add('button', 'edit-button', 'edit-cue-btn');
+                    cueEditButton.setAttribute('data-cue-id', data.db_id);
+                    cueEditButton.setAttribute('data-cue-name', data.name);
+                    cueEditButton.setAttribute('data-src-media-id', data.source_media_id);
+                    cueEditButton.setAttribute('data-src-media-timecode', data.source_media_timecode_secs);
+                    cueEditButton.setAttribute('data-target-media-id', data.target_media_id);
+                    cueEditButton.setAttribute('data-is-enabled', data.is_enabled);
+                    cueEditButton.innerText = 'Edit';
+                    cueElem.appendChild(cueEditButton);
+                    addListenersForEditCueBtns();
                 });
 
             } else {
@@ -83,31 +133,7 @@ let SRC_MEDIA_TIMECODE_INPUT = document.getElementById('editSourceMediaTimecode'
 let TARGET_MEDIA_INPUT = document.getElementById('editTargetMedia');
 let ENABLED_INPUT = document.getElementById('editEnabled');
 
-// Iterate through all edit buttons
-for (let i = 0; i < editCueButtons.length; i++) {
-    const editButton = editCueButtons[i];
-
-    // Open Edit Media Modal
-    editButton.addEventListener('click', function() {
-        CURRENT_CUE_BUTTON = this;
-        CURRENT_CUE_ID = this.getAttribute('data-cue-id');
-        const cueName = this.getAttribute('data-cue-name');
-        const srcMediaId = this.getAttribute('data-src-media-id');
-        const srcMediaTimecode = this.getAttribute('data-src-media-timecode');
-        const targetMediaID = this.getAttribute('data-target-media-id');
-        const isEnabled = this.getAttribute('data-is-enabled') === "True" || this.getAttribute('data-is-enabled') === true;
-
-        // Populate fields
-        CUE_NAME_INPUT.value = cueName;
-        SRC_MEDIA_INPUT.value = srcMediaId;
-        SRC_MEDIA_TIMECODE_INPUT.value = srcMediaTimecode
-        TARGET_MEDIA_INPUT.value = targetMediaID;
-        ENABLED_INPUT.checked = isEnabled;
-
-        // Open the modal
-        editCueModal.style.display = 'block';
-    });
-}
+addListenersForEditCueBtns();
 
 // Close the modal when the close button is clicked
 closeEditCueModalBtn.addEventListener('click', function() {

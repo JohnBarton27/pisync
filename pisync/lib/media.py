@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-from fastapi import UploadFile
 import os
 from pydantic import BaseModel
 import sqlite3
@@ -75,6 +74,8 @@ class Media(BaseModel, ABC):
                                       self.client_id,
                                       self.start_timecode,
                                       self.end_timecode))
+        self.db_id = cursor.lastrowid
+
         conn.commit()
         conn.close()
 
