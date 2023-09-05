@@ -5,13 +5,14 @@ function addListenersForEditCueBtns() {
 
         // Open Edit Cue Modal
         editButton.addEventListener('click', function() {
+            let dataIsEnabled = this.getAttribute('data-is-enabled');
             CURRENT_CUE_BUTTON = this;
             CURRENT_CUE_ID = this.getAttribute('data-cue-id');
             const cueName = this.getAttribute('data-cue-name');
             const srcMediaId = this.getAttribute('data-src-media-id');
             const srcMediaTimecode = this.getAttribute('data-src-media-timecode');
             const targetMediaID = this.getAttribute('data-target-media-id');
-            const isEnabled = this.getAttribute('data-is-enabled') === "True" || this.getAttribute('data-is-enabled') === true;
+            const isEnabled = dataIsEnabled === "True" || dataIsEnabled === true || dataIsEnabled === 'true';
 
             // Populate fields
             CUE_NAME_INPUT.value = cueName;
