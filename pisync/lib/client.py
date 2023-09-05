@@ -34,6 +34,8 @@ class Client(BaseModel):
 
         insert_query = "INSERT INTO clients (hostname, friendly_name, ip_address, is_online) VALUES (?, ?, ?, ?)"
         cursor.execute(insert_query, (self.hostname, self.friendly_name, self.ip_address, 1 if self.is_online else 0))
+        self.db_id = cursor.lastrowid
+
         conn.commit()
         conn.close()
 

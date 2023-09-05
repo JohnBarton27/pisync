@@ -75,6 +75,8 @@ class Media(BaseModel, ABC):
                                       self.client_id,
                                       self.start_timecode,
                                       self.end_timecode))
+        self.db_id = cursor.lastrowid
+
         conn.commit()
         conn.close()
 
