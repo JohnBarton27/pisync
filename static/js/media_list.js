@@ -49,6 +49,9 @@ function buildMediaList(mediaList) {
 
     mediaList.forEach(function(media) {
         let playingClass = playButtonStatuses[media.db_id];
+        if (playingClass === null || playingClass === undefined) {
+            playingClass = 'stopped';
+        }
         const thisClient = getClientById(clientObjects, media.client_id);
         const listElem = document.createElement('div');
         listElem.classList.add('list-item');
