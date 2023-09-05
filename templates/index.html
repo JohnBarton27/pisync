@@ -41,7 +41,7 @@
     <button id="addMediaBtn" class="button" style="margin-top: 10px;">Add Media</button>
 
     <h2>Cues</h2>
-    <div class="list">
+    <div id="cuesList" class="list">
         {% for cue in existing_cues %}
         <div class="list-item">
             <span class="item-name {% if not cue.is_enabled %} disabled-cue {% endif %}" data-cue-id="{{ cue.db_id }}">{{ cue.name }}</span>
@@ -56,8 +56,8 @@
             </button>
         </div>
         {% endfor %}
-        <button class="button" onclick="open_add_cue_modal()">Add Cue</button>
     </div>
+    <button class="button" style="margin-top: 10px;" onclick="open_add_cue_modal()">Add Cue</button>
 </div>
 
 <!-- Edit Media Modal -->
