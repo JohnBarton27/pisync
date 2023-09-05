@@ -233,6 +233,12 @@ def update_cue(cue_update: CueUpdateRequest):
     return cue
 
 
+@app.delete("/cue/{cue_id}")
+def delete_cue(cue_id: int):
+    cue = Cue.get_by_id(cue_id)
+    cue.delete()
+
+
 @app.on_event("shutdown")
 async def shutdown_event():
     print("STARTING SHUTDOWN...")
