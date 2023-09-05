@@ -125,6 +125,7 @@ let CURRENT_CUE_BUTTON = null;
 
 // Get the buttons that open the edit media modal
 const editCueButtons = document.getElementsByClassName('edit-cue-btn');
+let deleteCueBtn = document.getElementById('deleteCueBtn');
 
 // Form Elements
 let CUE_NAME_INPUT = document.getElementById('editCueName');
@@ -197,4 +198,17 @@ editCueForm.addEventListener('submit', function(event) {
         .catch(error => {
             console.error('Error:', error);
         });
+});
+
+deleteCueBtn.addEventListener('click', function() {
+    fetch(`/cue/${CURRENT_CUE_ID}`, {
+        method: 'DELETE'
+    }).then(response => {
+        if (response.ok) {
+            const cueListElem = document.querySelectorAll('[data-cue-id="' + CURRENT_CUE_ID + '"].list-item')[0];
+            cueListElem.remove()
+        } else {
+            console.error('Failed to delete cue!');
+        }
+    });
 });

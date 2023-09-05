@@ -43,7 +43,7 @@
     <h2>Cues</h2>
     <div id="cuesList" class="list">
         {% for cue in existing_cues %}
-        <div class="list-item">
+        <div class="list-item" data-cue-id="{{ cue.db_id }}">
             <span class="item-name {% if not cue.is_enabled %} disabled-cue {% endif %}" data-cue-id="{{ cue.db_id }}">{{ cue.name }}</span>
             <button class="button edit-button edit-cue-btn"
                     data-cue-id="{{ cue.db_id }}"
@@ -185,6 +185,7 @@
             <br><br>
 
             <input type="submit" value="Save Cue">
+            <button class="delete-button button" id="deleteCueBtn">Delete</button>
         </form>
     </div>
 </div>

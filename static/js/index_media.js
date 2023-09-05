@@ -145,8 +145,8 @@ deleteMediaButton.addEventListener('click', function() {
         method: 'DELETE'
     }).then(response => {
         if (response.ok) {
-            const mediaListElem = document.querySelectorAll('[data-media-id="' + CURRENT_MEDIA_ID + '"].list-item')[0];
-            mediaListElem.remove()
+            const mediaListElemToDelete = document.querySelectorAll('[data-media-id="' + CURRENT_MEDIA_ID + '"].list-item')[0];
+            mediaListElemToDelete.remove()
         } else {
             console.error('Failed to delete media!');
         }
