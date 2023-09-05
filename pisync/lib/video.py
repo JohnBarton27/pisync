@@ -22,13 +22,18 @@ class Video(Media):
 
     @classmethod
     def open_vlc(cls, fullscreen: bool = True):
-        #  creating vlc media player object
-        cls.media_player = vlc.MediaPlayer()
+        try:
+            #  creating vlc media player object
+            cls.media_player = vlc.MediaPlayer()
 
-        if fullscreen:
-            cls.media_player.toggle_fullscreen()
+            if fullscreen:
+                cls.media_player.toggle_fullscreen()
 
-        cls.set_black_screen()
+            cls.set_black_screen()
+        except:
+            print('Unable to open VLC! Will try again...')
+            time.sleep(10)
+            cls.open_vlc(fullscreen=fullscreen)
 
     def play(self, app):
         # media object

@@ -59,8 +59,8 @@ pip install -r requirements.txt
 ### Automatic Startup on Raspberry Pi
 It can be useful to have the server and/or client automatically start when the Raspberry Pi starts. This removes the need to connect a keyboard/mouse.
 
-1. Edit the crontab file (`sudo crontab -e`)
+1. Edit the crontab file (`crontab -e`)
 2. Add the following line:
 ```
-
+@reboot /PATH/TO/pisync/bin/start_client.sh
 ```
