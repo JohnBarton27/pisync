@@ -206,7 +206,7 @@ deleteCueBtn.addEventListener('click', function() {
     }).then(response => {
         if (response.ok) {
             const cueListElem = document.querySelectorAll('[data-cue-id="' + CURRENT_CUE_ID + '"].list-item')[0];
-            mediaListElem.remove()
+            cueListElem.remove()
         } else {
             console.error('Failed to delete cue!');
         }
