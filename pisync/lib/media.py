@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-from fastapi import UploadFile
 import os
 from pydantic import BaseModel
 import sqlite3
