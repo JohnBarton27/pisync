@@ -125,3 +125,100 @@ function get_checked_clients() {
 
     return checkedClients;
 }
+
+//////
+// EDIT CLIENT MODAL
+//////
+
+// Edit Media Modal Elements
+const editClientModal = document.getElementById('editClientModal');
+const closeEditClientModalBtn = document.getElementById('editClientModalClose');
+const editClientForm = document.getElementById('editClientForm');
+//const deleteClientButton = document.getElementById('deleteClientBtn');
+let CURRENT_CLIENT_ID = null;
+let CURRENT_CLIENT_BUTTON = null;
+
+// Get the buttons that open the edit media modal
+let editClientButtons = document.getElementsByClassName('edit-client-btn');
+
+// Form Fields
+const EDIT_CLIENT_NAME_INPUT = document.getElementById('clientName');
+const EDIT_CLIENT_IP_ADDRESS_INPUT = document.getElementById('clientIp');
+
+// Iterate through all edit buttons
+function addListenersForEditClientBtns() {
+    editClientButtons = document.getElementsByClassName('edit-client-btn');
+    for (let i = 0; i < editClientButtons.length; i++) {
+        const editButton = editClientButtons[i];
+
+        // Open Edit Media Modal
+        editButton.addEventListener('click', function () {
+            CURRENT_CLIENT_BUTTON = this;
+            CURRENT_CLIENT_ID = this.getAttribute('data-client-id');
+            const clientName = this.getAttribute('data-client-name');
+            const clientIp = this.getAttribute('data-client-ip-address');
+
+            // Populate the modal form with client name and IP address
+            EDIT_CLIENT_NAME_INPUT.value = clientName;
+            EDIT_CLIENT_IP_ADDRESS_INPUT.value = clientIp;
+
+            // Open the modal
+            editClientModal.style.display = 'block';
+        });
+    }
+}
+addListenersForEditClientBtns();
+
+// Close the modal when the close button is clicked
+closeEditClientModalBtn.addEventListener('click', function() {
+    editClientModal.style.display = 'none';
+});
+
+// Handle form submission
+editClientForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // Get data from the form
+    const newName = EDIT_CLIENT_NAME_INPUT.value;
+    const newIpAddress = EDIT_CLIENT_IP_ADDRESS_INPUT.value;
+
+    const clientUpdateRequest = {
+        db_id: CURRENT_CLIENT_ID,
+        name: newName,
+        ip_address: newIpAddress
+    };
+
+    // Create JSON body
+    const requestBody = JSON.stringify(clientUpdateRequest);
+
+    // Send PUT request
+    fetch(`/client/update`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: requestBody
+    })
+        .then(response => {
+            if (response.ok) {
+                // Handle success
+                console.log('Client updated successfully');
+                editClientModal.style.display = 'none';
+
+                response.json().then(data => {
+                    const nameDisplayElem = document.querySelectorAll('[data-client-id="' + CURRENT_CLIENT_ID + '"].item-name')[0];
+                    nameDisplayElem.innerHTML = data.friendly_name;
+
+                    CURRENT_CLIENT_BUTTON.setAttribute('data-client-name', data.friendly_name);
+                    CURRENT_CLIENT_BUTTON.setAttribute('data-client-ip-address', data.ip_address);
+                });
+
+            } else {
+                // Handle error
+                console.error('Failed to update client');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+});
