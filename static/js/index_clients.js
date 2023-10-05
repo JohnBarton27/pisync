@@ -134,7 +134,7 @@ function get_checked_clients() {
 const editClientModal = document.getElementById('editClientModal');
 const closeEditClientModalBtn = document.getElementById('editClientModalClose');
 const editClientForm = document.getElementById('editClientForm');
-//const deleteClientButton = document.getElementById('deleteClientBtn');
+const deleteClientButton = document.getElementById('deleteClientBtn');
 let CURRENT_CLIENT_ID = null;
 let CURRENT_CLIENT_BUTTON = null;
 
@@ -221,4 +221,17 @@ editClientForm.addEventListener('submit', function(event) {
         .catch(error => {
             console.error('Error:', error);
         });
+});
+
+deleteClientButton.addEventListener('click', function() {
+    fetch(`/client/${CURRENT_CLIENT_ID}`, {
+        method: 'DELETE'
+    }).then(response => {
+        if (response.ok) {
+            const clientListElemToDelete = document.querySelectorAll('[data-client-id="' + CURRENT_CLIENT_ID + '"].list-item')[0];
+            clientListElemToDelete.remove()
+        } else {
+            console.error('Failed to delete client!');
+        }
+    });
 });

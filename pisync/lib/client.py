@@ -69,6 +69,22 @@ class Client(BaseModel):
 
         self.is_online = is_online
 
+    def delete(self):
+        # Import here to avoid circular import
+        from pisync.lib.media import Media
+
+        # Delete all media this client held
+        for media in Media.get_for_client_id(self.db_id):
+            media.delete(remove_related_cues=True)
+
+        # Delete the client itself from the DB
+        conn = self.__class__.get_db_conn()
+        cursor = conn.cursor()
+        delete_query = "DELETE from clients WHERE id = ?"
+        cursor.execute(delete_query, (self.db_id,))
+        conn.commit()
+        conn.close()
+
     @classmethod
     def get_by_id(cls, db_id: int):
         for client in cls.get_all_from_db():

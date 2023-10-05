@@ -130,7 +130,7 @@ def add_client(request: ClientConnectRequest):
 
 
 @app.put('/client/update')
-def add_client(request: ClientUpdateRequest):
+def update_client(request: ClientUpdateRequest):
     print(f'Request to update clients')
 
     client_to_update = ClientObj.get_by_id(request.db_id)
@@ -142,6 +142,12 @@ def add_client(request: ClientUpdateRequest):
         client_to_update.update_ip_address(request.ip_address)
 
     return ClientObj.get_by_id(request.db_id)
+
+
+@app.delete("/client/{client_id}")
+def delete_cue(client_id: int):
+    client = ClientObj.get_by_id(client_id)
+    client.delete()
 
 
 @app.post("/play/{media_id}")
