@@ -9,6 +9,7 @@ import uvicorn
 
 from pisync.lib.api.client_connect_request import ClientConnectRequest
 from pisync.lib.api.client_search_response import Client as ApiClient, ClientSearchResponse
+from pisync.lib.api.client_update_request import ClientUpdateRequest
 from pisync.lib.api.cue_update_request import CueUpdateRequest
 from pisync.lib.api.create_cue_request import CreateCueRequest
 from pisync.lib.api.info_response import InfoResponse
@@ -126,6 +127,21 @@ def add_client(request: ClientConnectRequest):
     all_clients = ClientObj.get_all_from_db()
 
     return all_clients
+
+
+@app.put('/client/update')
+def add_client(request: ClientUpdateRequest):
+    print(f'Request to update clients')
+
+    client_to_update = ClientObj.get_by_id(request.db_id)
+
+    if request.name != client_to_update.friendly_name:
+        client_to_update.update_friendly_name(request.name)
+
+    if request.ip_address != client_to_update.ip_address:
+        client_to_update.update_ip_address(request.ip_address)
+
+    return ClientObj.get_by_id(request.db_id)
 
 
 @app.post("/play/{media_id}")

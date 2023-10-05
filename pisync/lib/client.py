@@ -49,6 +49,16 @@ class Client(BaseModel):
 
         self.friendly_name = new_name
 
+    def update_ip_address(self, new_ip_address: str):
+        conn = self.__class__.get_db_conn()
+        cursor = conn.cursor()
+        update_query = "UPDATE clients SET ip_address = ? WHERE id = ?"
+        cursor.execute(update_query, (new_ip_address, self.db_id))
+        conn.commit()
+        conn.close()
+
+        self.ip_address = new_ip_address
+
     def update_online_status(self, is_online: bool):
         conn = self.__class__.get_db_conn()
         cursor = conn.cursor()

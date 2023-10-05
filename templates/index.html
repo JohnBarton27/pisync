@@ -12,10 +12,15 @@
     <div id="clientDisplayList" class="list">
         {% for client in existing_clients %}
         <div class="list-item">
-            <span{% if not client.is_online %} class="offline-client"{% endif %} data-client-ip="{{ client.ip_address }}" data-client-id="{{ client.db_id }}">
+            <span {% if not client.is_online %} class="offline-client item-name"{% else %} class="item-name"{% endif %} data-client-ip="{{ client.ip_address }}" data-client-id="{{ client.db_id }}">
                 {{ client.friendly_name }}
             </span>
-            <button class="button edit-button">Edit</button>
+            <button class="button edit-button edit-client-btn"
+                    data-client-id="{{ client.db_id }}"
+                    data-client-name="{{ client.friendly_name }}"
+                    data-client-ip-address="{{ client.ip_address }}">
+                Edit
+            </button>
         </div>
         {% endfor %}
         <button class="button" onclick="search_for_clients()">Add Client</button>
@@ -58,6 +63,24 @@
         {% endfor %}
     </div>
     <button class="button" style="margin-top: 10px;" onclick="open_add_cue_modal()">Add Cue</button>
+</div>
+
+<!-- Edit Client Modal -->
+<div id="editClientModal" class="modal">
+    <div class="modal-content">
+        <span id="editClientModalClose" class="close-button">&times;</span>
+        <h2>Edit Client</h2>
+        <form id="editClientForm">
+            <label for="clientName">Name:</label>
+            <input type="text" id="clientName" name="clientName"><br><br>
+
+            <label for="clientIp">IP Address:</label>
+            <input type="text" id="clientIp" name="clientIp"><br><br>
+
+            <button type="submit" class="button">Save</button>
+            <!-- <button class="delete-button button" id="deleteClientBtn">Delete</button> -->
+        </form>
+    </div>
 </div>
 
 <!-- Edit Media Modal -->
