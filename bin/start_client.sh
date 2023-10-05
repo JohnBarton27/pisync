@@ -8,4 +8,4 @@ pisync=$(dirname "$pisync_bin")
 cd $pisync
 
 source venv/bin/activate
-python client.py &
+python client.py & > $HOME/pisync.log 2>&1
