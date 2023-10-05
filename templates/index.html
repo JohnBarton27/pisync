@@ -11,7 +11,7 @@
     <h2>Clients</h2>
     <div id="clientDisplayList" class="list">
         {% for client in existing_clients %}
-        <div class="list-item">
+        <div class="list-item" data-client-id="{{ client.db_id }}">
             <span {% if not client.is_online %} class="offline-client item-name"{% else %} class="item-name"{% endif %} data-client-ip="{{ client.ip_address }}" data-client-id="{{ client.db_id }}">
                 {{ client.friendly_name }}
             </span>
@@ -78,7 +78,7 @@
             <input type="text" id="clientIp" name="clientIp"><br><br>
 
             <button type="submit" class="button">Save</button>
-            <!-- <button class="delete-button button" id="deleteClientBtn">Delete</button> -->
+            <button class="delete-button button" id="deleteClientBtn">Delete</button>
         </form>
     </div>
 </div>

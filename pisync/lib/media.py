@@ -162,6 +162,22 @@ class Media(BaseModel, ABC):
         return medias
 
     @classmethod
+    def get_for_client_id(cls, client_id: int):
+        conn = cls.get_db_conn()
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+
+        select_query = "SELECT * FROM media WHERE client_id = ?;"
+        cursor.execute(select_query, (client_id,))
+        results = cursor.fetchall()
+
+        medias = []
+        for result in results:
+            medias.append(cls.get_from_db_result(result))
+
+        return medias
+
+    @classmethod
     def get_from_db_result(cls, result):
         from pisync.lib.audio import Audio
         from pisync.lib.video import Video
