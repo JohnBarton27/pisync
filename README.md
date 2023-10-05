@@ -55,3 +55,13 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
+
+### Automatic Startup on Raspberry Pi
+1. Press Super (Windows key) and search for "Startup Applications".
+2. Click on the "Startup Applications" icon.
+3. In the Startup Applications Preferences window, click on the "Add" button.
+4. Provide a name for your command, the command itself, and a comment if desired. For example:
+   - Name: PiSync Client
+   - Command: `/path/to/pisync/bin/start_client.sh`
+   - Comment: Start the PiSync Client
+5. Click "Add" to save.
