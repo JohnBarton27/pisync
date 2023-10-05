@@ -57,10 +57,11 @@ pip install -r requirements.txt
 ```
 
 ### Automatic Startup on Raspberry Pi
-It can be useful to have the server and/or client automatically start when the Raspberry Pi starts. This removes the need to connect a keyboard/mouse.
-
-1. Edit the crontab file (`crontab -e`)
-2. Add the following line:
-```
-@reboot /PATH/TO/pisync/bin/start_client.sh
-```
+1. Press Super (Windows key) and search for "Startup Applications".
+2. Click on the "Startup Applications" icon.
+3. In the Startup Applications Preferences window, click on the "Add" button.
+4. Provide a name for your command, the command itself, and a comment if desired. For example:
+   - Name: PiSync Client
+   - Command: `/path/to/pisync/bin/start_client.sh`
+   - Comment: Start the PiSync Client
+5. Click "Add" to save.
