@@ -6,6 +6,7 @@
 const clientSearchModal = document.getElementById('clientSearchModal');
 const closeClientSearchModalBtn = document.getElementById('clientSearchModalClose');
 const clientSearchModalHeader = document.getElementById('searchClientsHeader');
+const clientSearchModalHeaderHelper = document.getElementById('searchClientsHeaderHelper');
 const clientSearchConnectBtn = document.getElementById('connectToClientsBtn');
 
 // Close the modal when the close button is clicked
@@ -22,6 +23,7 @@ window.addEventListener('click', function(event) {
 
 function search_for_clients() {
     clientSearchModalHeader.textContent = 'Searching for Clients...';
+    clientSearchModalHeaderHelper.textContent = '(This may take several minutes)';
     clientSearchConnectBtn.style.display = 'none';
     let clientListElem = document.getElementById('clientList');
     clientListElem.innerHTML = '';
@@ -35,6 +37,7 @@ function search_for_clients() {
             console.log('Sent request to search for clients!');
 
             clientSearchModalHeader.textContent = 'Select Client(s) to Add'
+            clientSearchModalHeaderHelper.textContent = '';
 
             let response = JSON.parse(xhr.response);
 
