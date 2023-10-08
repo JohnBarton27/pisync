@@ -1,7 +1,10 @@
+import concurrent.futures
+import ipaddress
 from fastapi import FastAPI, Request, WebSocket, File, UploadFile, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+import os
 import requests
 import socket
 import threading
@@ -79,14 +82,26 @@ def search_for_clients():
     local_ip = s.getsockname()[0]
     s.close()
 
-    # Create a range of IP addresses in the local network
-    ip_range = local_ip[:local_ip.rfind('.')] + '.0/24'
+    def ping(host):
+        """
+        Returns True if host responds to a ping request
+        """
+        # Determine the ping command based on the platform
+        return os.system(f"ping -c 1 {host} > /dev/null") == 0
+
+    # Get active IPs on the network
+    active_ips = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+        results = {executor.submit(ping, str(ip)): ip for ip in ipaddress.ip_network("192.168.1.0/24", strict=False)}
+        for future in concurrent.futures.as_completed(results):
+            ip = results[future]
+            if future.result():
+                active_ips.append(str(ip))
 
     found_clients = []
 
     # Search for IPs with Port 8000 open
-    for i in range(135, 145):
-        ip = ip_range[:ip_range.rfind('.')] + '.' + str(i)
+    for ip in active_ips:
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(0.5)
