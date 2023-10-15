@@ -1,7 +1,7 @@
 import concurrent.futures
 import ipaddress
 from fastapi import FastAPI, Request, WebSocket, File, UploadFile, Form
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
@@ -13,12 +13,14 @@ import uvicorn
 from pisync.lib.api.client_connect_request import ClientConnectRequest
 from pisync.lib.api.client_search_response import Client as ApiClient, ClientSearchResponse
 from pisync.lib.api.client_update_request import ClientUpdateRequest
+from pisync.lib.api.create_ledpattern_request import CreateLedPatternRequest
 from pisync.lib.api.cue_update_request import CueUpdateRequest
 from pisync.lib.api.create_cue_request import CreateCueRequest
 from pisync.lib.api.info_response import InfoResponse
 from pisync.lib.api.media_update_request import MediaUpdateRequest
 from pisync.lib.client import Client as ClientObj
 from pisync.lib.cue import Cue
+from pisync.lib.led_pattern import LedPattern
 from pisync.lib.media import Media
 from pisync.lib.message import MediaPlayRequestMessage, MediaStopRequestMessage, MediaDeleteRequestMessage
 
@@ -274,6 +276,13 @@ def update_cue(cue_update: CueUpdateRequest):
 def delete_cue(cue_id: int):
     cue = Cue.get_by_id(cue_id)
     cue.delete()
+
+
+@app.post("/ledpattern")
+def create_led_pattern(led_pattern_request: CreateLedPatternRequest):
+    led_pattern = LedPattern(name=led_pattern_request.name, client_id=led_pattern_request.client_id)
+    led_pattern.insert_to_db()
+    return led_pattern
 
 
 @app.on_event("shutdown")
