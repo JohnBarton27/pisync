@@ -65,6 +65,16 @@ def setup_server_db():
     """
     db_cursor.execute(create_client_table_query)
 
+    # Define the LED Pattern table
+    create_led_table_query = """
+    CREATE TABLE IF NOT EXISTS ledPattern (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_id INTEGER,
+        name TEXT
+    )
+    """
+    db_cursor.execute(create_led_table_query)
+
     # Define the Cues table
     create_cue_table_query = """
     CREATE TABLE IF NOT EXISTS cues (
@@ -86,3 +96,12 @@ def setup_client_db():
     db_cursor = db_conn.cursor()
 
     setup_media_table(db_cursor, is_server=False)
+
+    # Define the LED Pattern table
+    create_led_table_query = """
+    CREATE TABLE IF NOT EXISTS ledPattern (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT
+    )
+    """
+    db_cursor.execute(create_led_table_query)
