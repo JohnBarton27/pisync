@@ -116,7 +116,7 @@ class LedPattern(BaseModel):
 
     @classmethod
     def get_from_db_result(cls, result):
-        return LedPattern(name=result['name'], client_id=result['client_id'],)
+        return LedPattern(db_id=result['id'], name=result['name'], client_id=result['client_id'],)
 
     @classmethod
     def get_db_conn(cls):

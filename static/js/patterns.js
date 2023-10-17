@@ -21,8 +21,6 @@ function addListenersForEditPatternBtns() {
 //////
 // ADD PATTERN MODAL
 //////
-console.log("IN PATTERNS.JS")
-
 const addPatternModal = document.getElementById('addPatternModal');
 const closeAddPatternModalBtn = document.getElementById('addPatternModalClose');
 const addPatternBtn = document.getElementById('addPatternBtn');
@@ -97,6 +95,24 @@ document.getElementById("addPatternForm").addEventListener("submit", function (e
             console.error('Error:', error);
         });
 });
+
+function playLedPattern(pattern_id) {
+    fetch(`/ledpatterns/play/${pattern_id}`, {
+        method: 'POST'
+    })
+        .then(response => {
+            if (response.ok) {
+                // Handle success
+                console.log('Pattern played successfully!');
+            } else {
+                // Handle error
+                console.error('Failed to play pattern');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
 
 //////
 // EDIT PATTERN MODAL

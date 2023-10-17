@@ -50,7 +50,7 @@
         {% for pattern in existing_led_patterns %}
         <div class="list-item" data-pattern-id="{{ pattern.db_id }}">
             <span{% if pattern.client and not pattern.client.is_online %} class="item-name offline-client" {% else %} class="item-name" {% endif %} data-pattern-id="{{ pattern.db_id }}">{{pattern.name}} {% if pattern.client %}({{pattern.client.friendly_name}}){% endif %}</span>
-            <button class="button play-button stopped" onclick="playLedPattern(this, `{{ pattern.db_id }}`)" data-pattern-id="{{ pattern.db_id }}">Play</button>
+            <button class="button play-button stopped" onclick="playLedPattern(`{{ pattern.db_id }}`)" data-pattern-id="{{ pattern.db_id }}">Play</button>
             <button class="button edit-button edit-pattern-btn"
                     data-pattern-id="{{ pattern.db_id }}"
                     data-pattern-name="{{ pattern.name }}">
