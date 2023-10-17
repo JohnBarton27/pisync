@@ -84,6 +84,8 @@ document.getElementById("addPatternForm").addEventListener("submit", function (e
                     patternEditButton.innerText = 'Edit';
                     patternElem.appendChild(patternEditButton);
                     addListenersForEditPatternBtns();
+
+                    // TODO add edit button
                 });
 
             } else {

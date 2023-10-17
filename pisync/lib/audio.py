@@ -3,6 +3,7 @@ import pygame
 import requests
 import threading
 
+from pisync.lib.led_pattern import LedPattern
 from pisync.socket_handlers.server import tell_frontend_client_media_status
 from pisync.lib.media import Media, MediaStatus
 
@@ -22,6 +23,7 @@ class Audio(Media):
         for cue in cues:
             timestamps[cue.source_media_timecode_secs] = {
                 'media': cue.target_media,
+                'pattern': cue.target_pattern,
                 'played': False
             }
 
@@ -48,13 +50,21 @@ class Audio(Media):
 
                     timestamps[timestamp]['played'] = True
                     target_media = timestamps[timestamp]['media']
+                    target_pattern = timestamps[timestamp]['pattern']
 
-                    if target_media.client_id:
-                        requests.post(f'http://0.0.0.0:{settings.API_PORT}/play/{target_media.db_id}')
-                    else:
-                        # Local
-                        cue_thread = threading.Thread(target=target_media.play)
-                        cue_thread.start()
+                    if target_pattern:
+                        if target_pattern.client_id:
+                            requests.post(f'http://0.0.0.0:{settings.API_PORT}/ledpatterns/play/{target_pattern.db_id}')
+                        else:
+                            LedPattern.play(target_pattern.name)
+
+                    if target_media:
+                        if target_media.client_id:
+                            requests.post(f'http://0.0.0.0:{settings.API_PORT}/play/{target_media.db_id}')
+                        else:
+                            # Local
+                            cue_thread = threading.Thread(target=target_media.play)
+                            cue_thread.start()
 
             if self.end_timecode and current_time >= self.end_timecode:
                 pygame.mixer.music.stop()

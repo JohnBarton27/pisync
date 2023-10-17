@@ -54,13 +54,23 @@ document.getElementById("mediaCueForm").addEventListener("submit", function (eve
     const sourceMedia = document.getElementById("sourceMedia").value;
     const sourceMediaTimecode = parseFloat(document.getElementById("sourceMediaTimecode").value);
     const targetMedia = document.getElementById("targetMedia").value;
+    const targetPattern = document.getElementById("targetPattern").value;
 
-    const requestBody = JSON.stringify({
+    let requestDict = {
         name: cueName,
         sourceMediaId: sourceMedia,
-        sourceMediaTimecode: sourceMediaTimecode,
-        targetMediaId: targetMedia
-    });
+        sourceMediaTimecode: sourceMediaTimecode
+    }
+
+    if (targetMedia) {
+        requestDict.targetMediaId = targetMedia;
+    }
+
+    if (targetPattern) {
+        requestDict.targetPatternId = targetPattern;
+    }
+
+    const requestBody = JSON.stringify(requestDict);
 
     // Send POST request
     fetch(`/cue`, {

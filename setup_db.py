@@ -83,6 +83,7 @@ def setup_server_db():
         source_media_id INT NOT NULL,
         source_media_timecode_secs REAL NOT NULL,
         target_media_id INT,
+        target_pattern_id INT,
         is_enabled INTEGER NOT NULL DEFAULT 1
     )
     """

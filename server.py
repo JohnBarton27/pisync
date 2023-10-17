@@ -261,7 +261,8 @@ def create_cue(cue_creation: CreateCueRequest):
     cue = Cue(name=cue_creation.name,
               source_media_id=cue_creation.sourceMediaId,
               source_media_timecode_secs=cue_creation.sourceMediaTimecode,
-              target_media_id=cue_creation.targetMediaId)
+              target_media_id=cue_creation.targetMediaId,
+              target_pattern_id=cue_creation.targetPatternId)
     cue.insert_to_db()
     return cue
 

@@ -201,8 +201,17 @@
 
             <label for="targetMedia">Target Media:</label>
             <select id="targetMedia" name="targetMedia" required>
+                <option value="">None</option>
                 {% for media in existing_media %}
                 <option value="{{ media.db_id }}">{{ media.name }}</option>
+                {% endfor %}
+            </select><br><br>
+
+            <label for="targetPattern">Target LED Pattern:</label>
+            <select id="targetPattern" name="targetPattern" required>
+                <option value="">None</option>
+                {% for pattern in existing_led_patterns %}
+                <option value="{{ pattern.db_id }}">{{ pattern.name }} {% if pattern.client %}({{pattern.client.friendly_name}}){% endif %}</option>
                 {% endfor %}
             </select><br><br>
 
