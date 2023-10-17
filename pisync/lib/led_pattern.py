@@ -11,8 +11,10 @@ class LedPattern(BaseModel):
     db_id: int = None
     client_id: Optional[int] = None
 
-    def play(self):
-        pass
+    @staticmethod
+    def play(pattern_name):
+        with open('/home/john/software/leds/light_command.txt', 'w') as pattern_file:
+            pattern_file.write(pattern_name)
 
     @property
     def client(self):

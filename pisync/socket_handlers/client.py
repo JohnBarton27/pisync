@@ -3,9 +3,10 @@ import socket
 import threading
 import time
 
+from pisync.lib.led_pattern import LedPattern
 from pisync.lib.media import Media
 from pisync.lib.message import (Message, ClientMediaDumpMessage, MediaPlayRequestMessage, MediaStopRequestMessage,
-                                MediaIsPlayingMessage, MediaStatus, MediaDeleteRequestMessage)
+                                MediaIsPlayingMessage, MediaStatus, MediaDeleteRequestMessage, LedPatternRequestMessage)
 
 import settings
 
@@ -82,6 +83,10 @@ def connect_to_server(app):
             print('Received message to delete media...')
             media_to_delete = Media.get_by_file_path(message_obj.media.file_path)
             media_to_delete.delete(remove_related_cues=False)
+        elif isinstance(message_obj, LedPatternRequestMessage):
+            print('Received message to show LED pattern...')
+            pattern_name = message_obj.pattern_name
+            LedPattern.play(pattern_name)
 
     receive_server_messages()
 

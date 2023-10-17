@@ -189,24 +189,6 @@ def play_media(media_id: int):
     return
 
 
-@app.post("/ledpatterns/play/{pattern_id}")
-def play_led_pattern(pattern_id: int):
-    pattern = LedPattern.get_by_id(pattern_id)
-
-    if pattern.client_id:
-        client_obj = ClientObj.get_by_id(pattern.client_id)
-        print(f'Looking for client {client_obj.hostname} for LED Pattern...')
-        for cli_socket in app.client_sockets:
-            if cli_socket.getpeername()[0] == client_obj.ip_address:
-                message = LedPatternRequestMessage(pattern.name)
-                message.send(cli_socket)
-
-        return
-
-    print(f'Playing local LED Pattern ({pattern.name})...')
-    pattern.play()
-    return
-
 @app.post("/stop/{media_id}")
 def stop_media(media_id: int):
     selected_media = None
@@ -304,6 +286,25 @@ def create_led_pattern(led_pattern_request: CreateLedPatternRequest):
     led_pattern = LedPattern(name=led_pattern_request.name, client_id=led_pattern_request.client_id)
     led_pattern.insert_to_db()
     return led_pattern
+
+
+@app.post("/ledpatterns/play/{pattern_id}")
+def play_led_pattern(pattern_id: int):
+    pattern = LedPattern.get_by_id(pattern_id)
+
+    if pattern.client_id:
+        client_obj = ClientObj.get_by_id(pattern.client_id)
+        print(f'Looking for client {client_obj.hostname} for LED Pattern...')
+        for cli_socket in app.client_sockets:
+            if cli_socket.getpeername()[0] == client_obj.ip_address:
+                message = LedPatternRequestMessage(pattern.name)
+                message.send(cli_socket)
+
+        return
+
+    print(f'Playing local LED Pattern ({pattern.name})...')
+    LedPattern.play(pattern.name)
+    return
 
 
 @app.on_event("shutdown")
