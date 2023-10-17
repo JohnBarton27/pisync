@@ -22,7 +22,8 @@ from pisync.lib.client import Client as ClientObj
 from pisync.lib.cue import Cue
 from pisync.lib.led_pattern import LedPattern
 from pisync.lib.media import Media
-from pisync.lib.message import MediaPlayRequestMessage, MediaStopRequestMessage, MediaDeleteRequestMessage
+from pisync.lib.message import MediaPlayRequestMessage, MediaStopRequestMessage, MediaDeleteRequestMessage, \
+    LedPatternRequestMessage
 
 from pisync.socket_handlers.server import connect_to_clients
 
@@ -187,6 +188,24 @@ def play_media(media_id: int):
     media.play(app)
     return
 
+
+@app.post("/ledpatterns/play/{pattern_id}")
+def play_led_pattern(pattern_id: int):
+    pattern = LedPattern.get_by_id(pattern_id)
+
+    if pattern.client_id:
+        client_obj = ClientObj.get_by_id(pattern.client_id)
+        print(f'Looking for client {client_obj.hostname} for LED Pattern...')
+        for cli_socket in app.client_sockets:
+            if cli_socket.getpeername()[0] == client_obj.ip_address:
+                message = LedPatternRequestMessage(pattern.name)
+                message.send(cli_socket)
+
+        return
+
+    print(f'Playing local LED Pattern ({pattern.name})...')
+    pattern.play()
+    return
 
 @app.post("/stop/{media_id}")
 def stop_media(media_id: int):

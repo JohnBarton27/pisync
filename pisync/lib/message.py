@@ -154,3 +154,15 @@ class MediaUploadRequestMessage(Message):
             print(f"Sent chunk {i//chunk_size + 1}/{total_chunks}")
 
         msg_socket.send(message)
+
+
+class LedPatternRequestMessage(Message):
+
+    def __init__(self, pattern_name: str):
+        """
+        Message the server sends a client to request an LED pattern
+
+        :param pattern_name: LED Pattern Name
+        """
+        self.pattern_name = pattern_name
+        super().__init__({'pattern_name': self.pattern_name}, 'LedPatternRequestMessage')
