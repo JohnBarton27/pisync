@@ -45,6 +45,22 @@
     </div>
     <button id="addMediaBtn" class="button" style="margin-top: 10px;">Add Media</button>
 
+    <h2>LED Patterns</h2>
+    <div id="ledPatternsList" class="list">
+        {% for pattern in existing_led_patterns %}
+        <div class="list-item" data-pattern-id="{{ pattern.db_id }}">
+            <span{% if pattern.client and not pattern.client.is_online %} class="item-name offline-client" {% else %} class="item-name" {% endif %} data-pattern-id="{{ pattern.db_id }}">{{pattern.name}} {% if pattern.client %}({{pattern.client.friendly_name}}){% endif %}</span>
+            <button class="button play-button stopped" onclick="playLedPattern(this, `{{ pattern.db_id }}`)" data-pattern-id="{{ pattern.db_id }}">Play</button>
+            <button class="button edit-button edit-pattern-btn"
+                    data-pattern-id="{{ pattern.db_id }}"
+                    data-pattern-name="{{ pattern.name }}">
+                Edit
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    <button class="button" style="margin-top: 10px;" onclick="open_add_pattern_modal()">Add Pattern</button>
+
     <h2>Cues</h2>
     <div id="cuesList" class="list">
         {% for cue in existing_cues %}
@@ -142,6 +158,28 @@
     </div>
 </div>
 
+<!-- Add Pattern Modal -->
+<div id="addPatternModal" class="modal">
+    <div class="modal-content">
+        <span id="addPatternModalClose" class="close-button">&times;</span>
+        <h2>Add Pattern</h2>
+        <form id="addPatternForm">
+            <label for="patternName">Name:</label>
+            <input type="text" id="patternName" name="patternName" required><br><br>
+
+            <label for="patternClientId">Client:</label>
+            <select id="patternClientId" name="patternClientId" required>
+                {% for client in existing_clients %}
+                <option value="{{ client.db_id }}">{{ client.friendly_name }}</option>
+                {% endfor %}
+            </select><br><br>
+
+            <input type="submit" value="Create Pattern">
+        </form>
+        <button id="addPatternBtn" type="submit" class="button" style="display:none;">Create Pattern</button>
+    </div>
+</div>
+
 <!-- Add Cue Modal -->
 <div id="addCueModal" class="modal">
     <div class="modal-content">
@@ -170,7 +208,7 @@
 
             <input type="submit" value="Create Media Cue">
         </form>
-        <button id="addCueBtn" type="submit" class="button" style="display:none;">Connect</button>
+        <button id="addCueBtn" type="submit" class="button" style="display:none;">Create</button>
     </div>
 </div>
 
@@ -218,6 +256,7 @@
 <script src="{{ url_for('static', path='/js/index_media.js') }}"></script>
 <script src="{{ url_for('static', path='/js/media_list.js') }}"></script>
 <script src="{{ url_for('static', path='/js/index_clients.js') }}"></script>
+<script src="{{ url_for('static', path='/js/patterns.js') }}"></script>
 <script src="{{ url_for('static', path='/js/sockets.js') }}"></script>
 
 </body>

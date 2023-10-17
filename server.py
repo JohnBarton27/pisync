@@ -63,10 +63,12 @@ async def read_root(request: Request):
     stored_media = Media.get_all_from_db()
     stored_clients = ClientObj.get_all_from_db()
     stored_cues = Cue.get_all_from_db()
+    stored_led_patterns = LedPattern.get_all_from_db()
     return templates.TemplateResponse("index.html", {"request": request,
                                                      "existing_media": stored_media,
                                                      "existing_clients": stored_clients,
-                                                     "existing_cues": stored_cues})
+                                                     "existing_cues": stored_cues,
+                                                     "existing_led_patterns": stored_led_patterns})
 
 
 @app.get('/info')
