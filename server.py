@@ -17,6 +17,7 @@ from pisync.lib.api.create_ledpattern_request import CreateLedPatternRequest
 from pisync.lib.api.cue_update_request import CueUpdateRequest
 from pisync.lib.api.create_cue_request import CreateCueRequest
 from pisync.lib.api.info_response import InfoResponse
+from pisync.lib.api.led_pattern_update_request import LedPatternUpdateRequest
 from pisync.lib.api.media_update_request import MediaUpdateRequest
 from pisync.lib.client import Client as ClientObj
 from pisync.lib.cue import Cue
@@ -291,6 +292,21 @@ def create_led_pattern(led_pattern_request: CreateLedPatternRequest):
     led_pattern = LedPattern(name=led_pattern_request.name, client_id=led_pattern_request.client_id)
     led_pattern.insert_to_db()
     return led_pattern
+
+
+@app.put("/ledpattern/update")
+def update_pattern(pattern_update: LedPatternUpdateRequest):
+    pattern = LedPattern.get_by_id(pattern_update.db_id)
+    pattern.update(pattern_update.name)
+
+    pattern = LedPattern.get_by_id(pattern_update.db_id)
+    return pattern
+
+
+@app.delete("/ledpattern/{pattern_id}")
+def delete_cue(pattern_id: int):
+    pattern = LedPattern.get_by_id(pattern_id)
+    pattern.delete()
 
 
 @app.post("/ledpatterns/play/{pattern_id}")

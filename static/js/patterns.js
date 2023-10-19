@@ -3,18 +3,16 @@ function addListenersForEditPatternBtns() {
     for (let i = 0; i < editPatternButtons.length; i++) {
         const editButton = editPatternButtons[i];
 
-        // // Open Edit Cue Modal
-        // editButton.addEventListener('click', function() {
-        //     CURRENT_PATTERN_BUTTON = this;
-        //     CURRENT_PATTERN_ID = this.getAttribute('data-pattern-id');
-        //     const patternName = this.getAttribute('data-pattern-name');
-        //
-        //     // Populate fields
-        //     PATTERN_NAME_ELEMENT.value = patternName;
-        //
-        //     // Open the modal
-        //     editPatternModal.style.display = 'block';
-        // });
+        // Open Edit Cue Modal
+        editButton.addEventListener('click', function() {
+            CURRENT_PATTERN_BUTTON = this;
+            CURRENT_PATTERN_ID = this.getAttribute('data-pattern-id');
+            // Populate fields
+            PATTERN_NAME_ELEMENT.value = this.getAttribute('data-pattern-name');
+
+            // Open the modal
+            editPatternModal.style.display = 'block';
+        });
     }
 }
 
@@ -119,98 +117,84 @@ function playLedPattern(pattern_id) {
 //////
 // EDIT PATTERN MODAL
 //////
-// const editCueModal = document.getElementById('editCueModal');
-// const closeEditCueModalBtn = document.getElementById('editCueModalClose');
-// const editCueForm = document.getElementById('editCueForm');
+const editPatternModal = document.getElementById('editPatternModal');
+const closeEditPatternModalBtn = document.getElementById('editPatternModalClose');
+const editPatternForm = document.getElementById('editPatternForm');
 let CURRENT_PATTERN_ID = null;
 let CURRENT_PATTERN_BUTTON = null;
-//
-// // Get the buttons that open the edit media modal
+
+// Get the buttons that open the edit pattern modal
 const editPatternButtons = document.getElementsByClassName('edit-pattern-btn');
-// let deleteCueBtn = document.getElementById('deleteCueBtn');
-//
-// // Form Elements
-//let PATTERN_NAME_ELEMENT = document.getElementById('editPatternName');
-// let SRC_MEDIA_INPUT = document.getElementById('editSourceMedia');
-// let SRC_MEDIA_TIMECODE_INPUT = document.getElementById('editSourceMediaTimecode');
-// let TARGET_MEDIA_INPUT = document.getElementById('editTargetMedia');
-// let ENABLED_INPUT = document.getElementById('editEnabled');
-//
-// addListenersForEditCueBtns();
-//
-// // Close the modal when the close button is clicked
-// closeEditCueModalBtn.addEventListener('click', function() {
-//     editCueModal.style.display = 'none';
-// });
-//
-// // Handle form submission
-// editCueForm.addEventListener('submit', function(event) {
-//     event.preventDefault();
-//
-//     const cueUpdateRequest = {
-//         db_id: CURRENT_CUE_ID,
-//         name: CUE_NAME_INPUT.value,
-//         source_media_id: SRC_MEDIA_INPUT.value,
-//         source_media_timecode: SRC_MEDIA_TIMECODE_INPUT.value,
-//         target_media_id: TARGET_MEDIA_INPUT.value,
-//         is_enabled: ENABLED_INPUT.checked
-//     }
-//
-//     // Create JSON body
-//     const requestBody = JSON.stringify(cueUpdateRequest);
-//
-//     // Send PUT request
-//     fetch(`/cue/update`, {
-//         method: 'PUT',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: requestBody
-//     })
-//         .then(response => {
-//             if (response.ok) {
-//                 // Handle success
-//                 console.log('Cue updated successfully');
-//                 editCueModal.style.display = 'none';
-//
-//                 response.json().then(data => {
-//                     // Update data attributes on edit button
-//                     CURRENT_CUE_BUTTON.setAttribute('data-cue-name', data.name);
-//                     CURRENT_CUE_BUTTON.setAttribute('data-src-media-id', data.source_media_id);
-//                     CURRENT_CUE_BUTTON.setAttribute('data-src-media-timecode', data.source_media_timecode_secs);
-//                     CURRENT_CUE_BUTTON.setAttribute('data-target-media-id', data.target_media_id);
-//                     CURRENT_CUE_BUTTON.setAttribute('data-is-enabled', data.is_enabled);
-//
-//                     // Update display name
-//                     const nameDisplayElem = document.querySelectorAll('[data-cue-id="' + CURRENT_CUE_ID + '"].item-name')[0];
-//                     nameDisplayElem.innerHTML = data.name;
-//
-//                     if (data.is_enabled && nameDisplayElem.classList.contains('disabled-cue')) {
-//                         nameDisplayElem.classList.remove('disabled-cue');
-//                     } else if (!data.is_enabled && !nameDisplayElem.classList.contains('disabled-cue')) {
-//                         nameDisplayElem.classList.add('disabled-cue');
-//                     }
-//                 });
-//
-//             } else {
-//                 // Handle error
-//                 console.error('Failed to update cue');
-//             }
-//         })
-//         .catch(error => {
-//             console.error('Error:', error);
-//         });
-// });
-//
-// deleteCueBtn.addEventListener('click', function() {
-//     fetch(`/cue/${CURRENT_CUE_ID}`, {
-//         method: 'DELETE'
-//     }).then(response => {
-//         if (response.ok) {
-//             const cueListElem = document.querySelectorAll('[data-cue-id="' + CURRENT_CUE_ID + '"].list-item')[0];
-//             cueListElem.remove()
-//         } else {
-//             console.error('Failed to delete cue!');
-//         }
-//     });
-// });
+let deletePatternBtn = document.getElementById('deletePatternBtn');
+
+// Form Elements
+let PATTERN_NAME_ELEMENT = document.getElementById('editPatternName');
+
+addListenersForEditPatternBtns();
+
+// Close the modal when the close button is clicked
+closeEditPatternModalBtn.addEventListener('click', function() {
+    editPatternModal.style.display = 'none';
+});
+
+// Handle form submission
+editPatternForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const patternUpdateRequest = {
+        db_id: CURRENT_PATTERN_ID,
+        name: PATTERN_NAME_ELEMENT.value
+    }
+
+    // Create JSON body
+    const requestBody = JSON.stringify(patternUpdateRequest);
+
+    // Send PUT request
+    fetch(`/ledpattern/update`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: requestBody
+    })
+        .then(response => {
+            if (response.ok) {
+                // Handle success
+                console.log('Pattern updated successfully');
+                editPatternModal.style.display = 'none';
+
+                response.json().then(data => {
+                    // Update data attributes on edit button
+                    CURRENT_PATTERN_BUTTON.setAttribute('data-pattern-name', data.name);
+
+                    let displayName = data.name
+                    if (data.client) {
+                        displayName = `${displayName} (${data.client.friendlyName})`;
+                    }
+                    // Update display name
+                    const nameDisplayElem = document.querySelectorAll('[data-pattern-id="' + CURRENT_PATTERN_ID + '"].item-name')[0];
+                    nameDisplayElem.innerHTML = displayName;
+                });
+
+            } else {
+                // Handle error
+                console.error('Failed to update pattern');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+});
+
+deletePatternBtn.addEventListener('click', function() {
+    fetch(`/ledpattern/${CURRENT_PATTERN_ID}`, {
+        method: 'DELETE'
+    }).then(response => {
+        if (response.ok) {
+            const patternListElem = document.querySelectorAll('[data-pattern-id="' + CURRENT_PATTERN_ID + '"].list-item')[0];
+            patternListElem.remove()
+        } else {
+            console.error('Failed to delete pattern!');
+        }
+    });
+});
