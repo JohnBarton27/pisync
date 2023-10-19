@@ -44,7 +44,7 @@ class Audio(Media):
             print(f'Current time: {current_time}', end="\r")
 
             for timestamp in timestamps:
-                if current_time >= timestamp:
+                if current_time >= timestamp and (current_time - timestamp) <= 1:
                     if timestamps[timestamp].get('played'):
                         continue
 

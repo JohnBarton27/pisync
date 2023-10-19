@@ -260,9 +260,13 @@ def delete_media(media_id: int):
 def create_cue(cue_creation: CreateCueRequest):
     cue = Cue(name=cue_creation.name,
               source_media_id=cue_creation.sourceMediaId,
-              source_media_timecode_secs=cue_creation.sourceMediaTimecode,
-              target_media_id=cue_creation.targetMediaId,
-              target_pattern_id=cue_creation.targetPatternId)
+              source_media_timecode_secs=cue_creation.sourceMediaTimecode)
+
+    if cue_creation.targetMediaId:
+        cue.target_media_id = cue_creation.targetMediaId
+    if cue_creation.targetPatternId:
+        cue.target_pattern_id = cue_creation.targetPatternId
+
     cue.insert_to_db()
     return cue
 
@@ -270,7 +274,7 @@ def create_cue(cue_creation: CreateCueRequest):
 @app.put("/cue/update")
 def update_cue(cue_update: CueUpdateRequest):
     cue = Cue.get_by_id(cue_update.db_id)
-    cue.update(cue_update.name, cue_update.source_media_id, cue_update.source_media_timecode, cue_update.target_media_id, cue_update.is_enabled)
+    cue.update(cue_update.name, cue_update.source_media_id, cue_update.source_media_timecode, cue_update.target_media_id, cue_update.target_pattern_id, cue_update.is_enabled)
 
     cue = Cue.get_by_id(cue_update.db_id)
     return cue

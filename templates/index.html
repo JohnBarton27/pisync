@@ -72,6 +72,7 @@
                     data-src-media-id="{{ cue.source_media_id }}"
                     data-src-media-timecode="{{ cue.source_media_timecode_secs }}"
                     data-target-media-id="{{ cue.target_media_id }}"
+                    data-target-pattern-id="{{ cue.target_pattern_id }}"
                     data-is-enabled="{{ cue.is_enabled }}">
                 Edit
             </button>
@@ -200,7 +201,7 @@
             <input type="text" id="sourceMediaTimecode" name="sourceMediaTimecode" required><br><br>
 
             <label for="targetMedia">Target Media:</label>
-            <select id="targetMedia" name="targetMedia" required>
+            <select id="targetMedia" name="targetMedia">
                 <option value="">None</option>
                 {% for media in existing_media %}
                 <option value="{{ media.db_id }}">{{ media.name }}</option>
@@ -208,7 +209,7 @@
             </select><br><br>
 
             <label for="targetPattern">Target LED Pattern:</label>
-            <select id="targetPattern" name="targetPattern" required>
+            <select id="targetPattern" name="targetPattern">
                 <option value="">None</option>
                 {% for pattern in existing_led_patterns %}
                 <option value="{{ pattern.db_id }}">{{ pattern.name }} {% if pattern.client %}({{pattern.client.friendly_name}}){% endif %}</option>
@@ -241,9 +242,18 @@
             <input type="text" id="editSourceMediaTimecode" name="editSourceMediaTimecode" required><br><br>
 
             <label for="editTargetMedia">Target Media:</label>
-            <select id="editTargetMedia" name="editTargetMedia" required>
+            <select id="editTargetMedia" name="editTargetMedia">
+                <option value="">None</option>
                 {% for media in existing_media %}
                 <option value="{{ media.db_id }}">{{ media.name }}</option>
+                {% endfor %}
+            </select><br><br>
+
+            <label for="editTargetPattern">Target LED Pattern:</label>
+            <select id="editTargetPattern" name="editTargetPattern">
+                <option value="">None</option>
+                {% for pattern in existing_led_patterns %}
+                <option value="{{ pattern.db_id }}">{{ pattern.name }} {% if pattern.client %}({{pattern.client.friendly_name}}){% endif %}</option>
                 {% endfor %}
             </select><br><br>
 

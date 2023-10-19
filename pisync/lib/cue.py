@@ -119,7 +119,13 @@ class Cue(BaseModel):
         db_id = result['id']
         is_enabled = bool(result['is_enabled'])
 
-        return Cue(name=name, db_id=db_id, source_media_id=source_media_id, source_media_timecode_secs=source_media_timecode_secs, target_media_id=target_media_id, target_pattern_id=target_pattern_id, is_enabled=is_enabled)
+        cue = Cue(name=name, db_id=db_id, source_media_id=source_media_id, source_media_timecode_secs=source_media_timecode_secs, is_enabled=is_enabled)
+        if target_media_id:
+            cue.target_media_id = target_media_id
+        if target_pattern_id:
+            cue.target_pattern_id = target_pattern_id
+
+        return cue
 
     @classmethod
     def get_db_conn(cls):

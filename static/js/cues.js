@@ -12,6 +12,7 @@ function addListenersForEditCueBtns() {
             const srcMediaId = this.getAttribute('data-src-media-id');
             const srcMediaTimecode = this.getAttribute('data-src-media-timecode');
             const targetMediaID = this.getAttribute('data-target-media-id');
+            const targetPatternID = this.getAttribute('data-target-pattern-id');
             const isEnabled = dataIsEnabled === "True" || dataIsEnabled === true || dataIsEnabled === 'true';
 
             // Populate fields
@@ -19,6 +20,7 @@ function addListenersForEditCueBtns() {
             SRC_MEDIA_INPUT.value = srcMediaId;
             SRC_MEDIA_TIMECODE_INPUT.value = srcMediaTimecode
             TARGET_MEDIA_INPUT.value = targetMediaID;
+            TARGET_PATTERN_INPUT.value = targetPatternID;
             ENABLED_INPUT.checked = isEnabled;
 
             // Open the modal
@@ -142,6 +144,7 @@ let CUE_NAME_INPUT = document.getElementById('editCueName');
 let SRC_MEDIA_INPUT = document.getElementById('editSourceMedia');
 let SRC_MEDIA_TIMECODE_INPUT = document.getElementById('editSourceMediaTimecode');
 let TARGET_MEDIA_INPUT = document.getElementById('editTargetMedia');
+let TARGET_PATTERN_INPUT = document.getElementById('editTargetPattern');
 let ENABLED_INPUT = document.getElementById('editEnabled');
 
 addListenersForEditCueBtns();
@@ -155,13 +158,20 @@ closeEditCueModalBtn.addEventListener('click', function() {
 editCueForm.addEventListener('submit', function(event) {
     event.preventDefault();
 
-    const cueUpdateRequest = {
+    let cueUpdateRequest = {
         db_id: CURRENT_CUE_ID,
         name: CUE_NAME_INPUT.value,
         source_media_id: SRC_MEDIA_INPUT.value,
         source_media_timecode: SRC_MEDIA_TIMECODE_INPUT.value,
-        target_media_id: TARGET_MEDIA_INPUT.value,
         is_enabled: ENABLED_INPUT.checked
+    }
+
+    if (TARGET_MEDIA_INPUT.value) {
+        cueUpdateRequest.target_media_id = TARGET_MEDIA_INPUT.value;
+    }
+
+    if (TARGET_PATTERN_INPUT.value) {
+        cueUpdateRequest.target_pattern_id = TARGET_PATTERN_INPUT.value;
     }
 
     // Create JSON body
@@ -187,6 +197,7 @@ editCueForm.addEventListener('submit', function(event) {
                     CURRENT_CUE_BUTTON.setAttribute('data-src-media-id', data.source_media_id);
                     CURRENT_CUE_BUTTON.setAttribute('data-src-media-timecode', data.source_media_timecode_secs);
                     CURRENT_CUE_BUTTON.setAttribute('data-target-media-id', data.target_media_id);
+                    CURRENT_CUE_BUTTON.setAttribute('data-target-pattern-id', data.target_pattern_id);
                     CURRENT_CUE_BUTTON.setAttribute('data-is-enabled', data.is_enabled);
 
                     // Update display name
