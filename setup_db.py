@@ -17,8 +17,7 @@ def setup_media_table(cursor, is_server: bool):
         file_name TEXT UNIQUE,
         file_type TEXT,
         start_timecode REAL,
-        end_timecode REAL,
-        client_id INTEGER
+        end_timecode REAL
     """
 
     if is_server:
